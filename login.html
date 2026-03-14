@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign in | SocietyHub</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+  <style>
+    .auth-page { min-height: 100vh; background: var(--bg-body); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
+    .auth-card { max-width: 400px; width: 100%; border-radius: var(--radius); background: var(--bg-card); box-shadow: var(--shadow); border: 1px solid var(--border); padding: 2rem; }
+    .auth-page .logo-wrap { width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(145deg, var(--primary), var(--primary-dark)); color: #fff; font-size: 1.75rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
+    .auth-page h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--text); text-align: center; }
+    .auth-page .sub { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; text-align: center; }
+    .auth-page .form-label { font-weight: 600; color: var(--text); }
+    .auth-page .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 0.2rem rgba(47, 128, 237, 0.2); }
+    .auth-page .btn-primary { width: 100%; padding: 0.75rem 1rem; font-weight: 600; }
+    .auth-page .error-msg { color: var(--danger, #dc3545); font-size: 0.9rem; margin-top: 0.5rem; display: none; }
+    .auth-page .error-msg.show { display: block; }
+    .auth-page .signup-link { display: block; text-align: center; margin-top: 1rem; color: var(--primary); font-weight: 600; text-decoration: none; }
+    .auth-page .signup-link:hover { color: var(--primary-dark); }
+  </style>
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-card">
+      <div class="logo-wrap"><i class="fas fa-building"></i></div>
+      <h1>SocietyHub</h1>
+      <p class="sub">Sign in to your society account</p>
+      <form id="loginForm">
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" id="email" class="form-control" placeholder="you@example.com" required autocomplete="email">
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">Password</label>
+          <input type="password" id="password" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+        <p id="errorMsg" class="error-msg"></p>
+        <button type="submit" class="btn btn-primary" id="submitBtn">Sign in</button>
+        <a href="signup.html" class="signup-link">Create account / Sign up</a>
+      </form>
+    </div>
+  </div>
+  <script>
+    (function () {
+      window.API_BASE = window.API_BASE || 'http://localhost:3000';
+      var base = (window.API_BASE || '').replace(/\/$/, '');
+      var form = document.getElementById('loginForm');
+      var errorMsg = document.getElementById('errorMsg');
+      var submitBtn = document.getElementById('submitBtn');
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        errorMsg.classList.remove('show');
+        errorMsg.textContent = '';
+        var email = document.getElementById('email').value.trim();
+        var password = document.getElementById('password').value;
+        if (!email || !password) {
+          errorMsg.textContent = 'Please enter email and password';
+          errorMsg.classList.add('show');
+          return;
+        }
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Signing in…';
+        var apiUrl = base ? base + '/auth/login' : '/auth/login';
+        fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email, password: password }),
+        })
+          .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
+          .then(function (result) {
+            if (result.ok && result.data.success && result.data.data) {
+              var d = result.data.data;
+              if (d.accessToken) localStorage.setItem('accessToken', d.accessToken);
+              if (d.user) localStorage.setItem('user', JSON.stringify(d.user));
+              window.location.replace('dashboard.html');
+            } else {
+              errorMsg.textContent = (result.data && result.data.message) || 'Invalid email or password';
+              errorMsg.classList.add('show');
+              submitBtn.disabled = false;
+              submitBtn.textContent = 'Sign in';
+            }
+          })
+          .catch(function () {
+            errorMsg.textContent = 'Network error. Please try again.';
+            errorMsg.classList.add('show');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Sign in';
+          });
+      });
+    })();
+  </script>
+</body>
+</html>

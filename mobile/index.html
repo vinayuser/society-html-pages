@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#7c3aed">
+  <!-- Base ensures CSS/JS load correctly when URL is /mobile (no trailing slash) -->
+  <base href="/mobile/">
+  <title>SocietyHub - Home</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link href="mobile.css" rel="stylesheet">
+</head>
+<body>
+  <script src="api.js"></script>
+  <script src="auth-gate.js"></script>
+  <div class="app-shell">
+    <header class="app-bar">
+      <a href="index.html" class="logo">SH</a>
+      <h1 class="title">SocietyHub</h1>
+      <div class="notif-wrap">
+        <button type="button" class="icon-btn" aria-label="Notifications"><i class="fas fa-bell"></i></button>
+        <span class="notif-badge">2</span>
+      </div>
+      <a href="profile.html" class="avatar" id="headerAvatar">R</a>
+    </header>
+    <main class="app-content">
+      <div class="section-block">
+        <h2 class="sb-title">Pre Approve Visitors</h2>
+        <p class="sb-subtitle">Add visitor details for quick entries</p>
+        <div class="action-row">
+          <a href="visitor-invite.html" class="action-card ac-guest">
+            <span class="ac-icon"><i class="fas fa-user-plus"></i></span>
+            <span>Add Guest</span>
+          </a>
+          <a href="#" class="action-card ac-delivery">
+            <span class="ac-icon"><i class="fas fa-box"></i></span>
+            <span>Add Delivery</span>
+          </a>
+          <a href="#" class="action-card ac-service">
+            <span class="ac-icon"><i class="fas fa-tools"></i></span>
+            <span>Add Service</span>
+          </a>
+          <a href="#" class="action-card ac-cab">
+            <span class="ac-icon"><i class="fas fa-car"></i></span>
+            <span>Add Cab</span>
+          </a>
+        </div>
+        <p style="margin:0; font-size:0.8rem;"><a href="visitor-approval.html" style="color:var(--primary); font-weight:600;">Visitor at gate? Tap to allow or deny</a></p>
+      </div>
+      <div class="section-block">
+        <h2 class="sb-title">Community</h2>
+        <p class="sb-subtitle">Everything about society management</p>
+        <ul class="community-list">
+          <li>
+            <a href="complaints.html" class="community-item">
+              <span class="ci-icon help"><i class="fas fa-headset"></i></span>
+              <span class="ci-body">
+                <span class="ci-title">HelpDesk</span>
+                <span class="ci-sub">Complaint & Suggestions</span>
+              </span>
+              <i class="fas fa-chevron-right" style="color:var(--text-muted); font-size:0.9rem;"></i>
+            </a>
+          </li>
+          <li>
+            <a href="notices.html" class="community-item">
+              <span class="ci-icon notice"><i class="fas fa-bullhorn"></i></span>
+              <span class="ci-body">
+                <span class="ci-title">Notice Board</span>
+                <span class="ci-sub">Society Announcements</span>
+              </span>
+              <span class="ci-badge">2</span>
+              <i class="fas fa-chevron-right" style="color:var(--text-muted); font-size:0.9rem;"></i>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="community-item">
+              <span class="ci-icon payment"><i class="fas fa-file-invoice-dollar"></i></span>
+              <span class="ci-body">
+                <span class="ci-title">Due Society Payment</span>
+                <span class="ci-sub">Direct payment of society dues</span>
+              </span>
+              <i class="fas fa-chevron-right" style="color:var(--text-muted); font-size:0.9rem;"></i>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="community-item">
+              <span class="ci-icon amenity"><i class="fas fa-calendar-check"></i></span>
+              <span class="ci-body">
+                <span class="ci-title">Book Amenities</span>
+                <span class="ci-sub">Pre book Society Amenities</span>
+              </span>
+              <i class="fas fa-chevron-right" style="color:var(--text-muted); font-size:0.9rem;"></i>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </main>
+    <nav class="tab-bar">
+      <a href="index.html" class="active"><i class="fas fa-home"></i><span>Home</span></a>
+      <a href="activity.html"><i class="fas fa-clock"></i><span>Activity</span></a>
+      <a href="visitors.html"><i class="fas fa-user-friends"></i><span>Visitors</span></a>
+      <a href="more.html"><i class="fas fa-ellipsis-h"></i><span>More</span></a>
+    </nav>
+  </div>
+  <script>
+    (function(){ var u = window.MobileAPI && window.MobileAPI.getUser(); if (u && u.name) { var a = document.getElementById('headerAvatar'); if (a) a.textContent = (u.name.trim().charAt(0) || 'R').toUpperCase(); } })();
+  </script>
+</body>
+</html>

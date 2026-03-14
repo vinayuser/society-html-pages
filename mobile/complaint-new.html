@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2563EB">
+  <base href="/mobile/">
+  <title>Report issue | SocietyHub</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link href="mobile.css" rel="stylesheet">
+</head>
+<body>
+  <script src="api.js"></script>
+  <script src="auth-gate.js"></script>
+  <div class="app-shell">
+    <header class="app-bar">
+      <a href="complaints.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+      <h1 class="title">Report issue</h1>
+    </header>
+    <main class="app-content no-tabs">
+      <p class="page-sub" style="margin-bottom:20px;">Raise a complaint. Management will be notified.</p>
+      <form id="complaintForm">
+        <div class="form-group">
+          <label>Category *</label>
+          <select id="category" required>
+            <option value="">Select category</option>
+            <option value="Maintenance">Maintenance (lift, plumbing, etc.)</option>
+            <option value="Electrical">Electrical</option>
+            <option value="Infrastructure">Infrastructure (lights, roads, parking)</option>
+            <option value="Security">Security</option>
+            <option value="Common area">Common area</option>
+            <option value="Noise / nuisance">Noise / nuisance</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Subject *</label>
+          <input type="text" id="title" placeholder="Brief title of the issue" required>
+        </div>
+        <div class="form-group">
+          <label>Description *</label>
+          <textarea rows="4" id="description" placeholder="Describe the issue in detail." required></textarea>
+        </div>
+        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:20px;">Your complaint will be sent to the society management.</p>
+        <p id="formError" style="color:var(--danger); font-size:0.9rem; display:none;"></p>
+        <button type="submit" class="btn-block btn-primary" id="submitBtn">Submit complaint</button>
+      </form>
+    </main>
+  </div>
+  <script>
+    (function(){
+      document.getElementById('complaintForm').addEventListener('submit', function(e){
+        e.preventDefault();
+        var title = document.getElementById('title').value.trim();
+        var description = document.getElementById('description').value.trim();
+        var category = document.getElementById('category').value || 'Other';
+        var err = document.getElementById('formError');
+        var btn = document.getElementById('submitBtn');
+        if (!title || !description) { err.textContent = 'Please fill subject and description.'; err.style.display = 'block'; return; }
+        err.style.display = 'none';
+        btn.disabled = true;
+        btn.textContent = 'Submitting…';
+        window.MobileAPI.apiPost('/complaints', { title: title, description: description, category: category }).then(function(){
+          window.location.href = 'complaints.html';
+        }).catch(function(m){ err.textContent = m.message || 'Failed to submit.'; err.style.display = 'block'; btn.disabled = false; btn.textContent = 'Submit complaint'; });
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2563EB">
+  <base href="/mobile/">
+  <title>Your Complaints | SocietyHub</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link href="mobile.css" rel="stylesheet">
+</head>
+<body>
+  <script src="api.js"></script>
+  <script src="auth-gate.js"></script>
+  <div class="app-shell">
+    <header class="app-bar">
+      <span class="title">Your complaints</span>
+      <button type="button" class="icon-btn" aria-label="Notifications"><i class="fas fa-bell"></i></button>
+      <a href="profile.html" class="avatar">R</a>
+    </header>
+    <main class="app-content">
+      <p class="page-sub" style="margin-bottom:16px;">Raise and track your complaints.</p>
+      <div class="content-header">
+        <h1 class="page-heading" style="margin:0;">Complaints</h1>
+        <a href="complaint-new.html" class="btn-add"><i class="fas fa-plus"></i> New</a>
+      </div>
+      <div class="segments">
+        <a href="#" class="segment-tab active" data-status="">All</a>
+        <a href="#" class="segment-tab" data-status="open">Open</a>
+        <a href="#" class="segment-tab" data-status="resolved">Resolved</a>
+      </div>
+      <div id="complaintsLoading" class="empty-state" style="padding:24px; display:none;"><p class="es-text">Loading…</p></div>
+      <div id="complaintsEmpty" class="empty-state" style="padding:24px; display:none;"><p class="es-text">No complaints. Tap New to raise one.</p></div>
+      <div id="complaintsOpenWrap"><div class="list-section-title" id="openTitle" style="display:none;">Open</div><div id="complaintsOpen"></div></div>
+      <div id="complaintsResolvedWrap"><div class="list-section-title" id="resolvedTitle" style="display:none;">Resolved</div><div id="complaintsResolved"></div></div>
+    </main>
+    <nav class="tab-bar">
+      <a href="index.html"><i class="fas fa-home"></i><span>Home</span></a>
+      <a href="visitors.html"><i class="fas fa-user-friends"></i><span>Visitors</span></a>
+      <a href="deliveries.html"><i class="fas fa-box"></i><span>Deliveries</span></a>
+      <a href="complaints.html" class="active"><i class="fas fa-exclamation-circle"></i><span>Complaints</span></a>
+      <a href="more.html"><i class="fas fa-ellipsis-h"></i><span>More</span></a>
+    </nav>
+  </div>
+  <script>
+    (function(){
+      var loading = document.getElementById('complaintsLoading');
+      var empty = document.getElementById('complaintsEmpty');
+      var openWrap = document.getElementById('complaintsOpenWrap');
+      var resolvedWrap = document.getElementById('complaintsResolvedWrap');
+      var openTitle = document.getElementById('openTitle');
+      var resolvedTitle = document.getElementById('resolvedTitle');
+      var openList = document.getElementById('complaintsOpen');
+      var resolvedList = document.getElementById('complaintsResolved');
+      var currentFilter = '';
+      function renderList(items){
+        openList.innerHTML = '';
+        resolvedList.innerHTML = '';
+        var open = items.filter(function(c){ return c.status !== 'resolved'; });
+        var resolved = items.filter(function(c){ return c.status === 'resolved'; });
+        if (currentFilter === 'resolved') { open = []; } else if (currentFilter === 'open') { resolved = []; }
+        openTitle.style.display = open.length ? 'block' : 'none';
+        resolvedTitle.style.display = resolved.length ? 'block' : 'none';
+        open.forEach(function(c){ openList.appendChild(mkCard(c)); });
+        resolved.forEach(function(c){ resolvedList.appendChild(mkCard(c)); });
+      }
+      function mkCard(c){
+        var statusClass = c.status === 'resolved' ? 'resolved' : 'in-progress';
+        var statusLabel = c.status === 'resolved' ? 'Resolved' : (c.status === 'in_progress' ? 'In progress' : 'Open');
+        var dateStr = c.createdAt ? new Date(c.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+        var a = document.createElement('a');
+        a.href = 'complaint-detail.html?id=' + c.id;
+        a.style.textDecoration = 'none'; a.style.color = 'inherit';
+        a.innerHTML = '<div class="info-card accent-' + (c.status === 'resolved' ? 'success' : 'warning') + '"><div class="ic-header"><h3 class="ic-title">' + (c.title || '').replace(/</g,'&lt;') + '</h3><span class="ic-badge ' + statusClass + '">' + statusLabel + '</span></div><div class="ic-meta">Category: ' + (c.category || 'General') + ' · Raised ' + dateStr + '</div><div class="ic-detail">' + (c.description || '').substring(0,120).replace(/</g,'&lt;') + (c.description && c.description.length > 120 ? '…' : '') + '</div><div class="ic-footer"><span class="ic-time">' + (c.resolvedAt ? 'Resolved ' + new Date(c.resolvedAt).toLocaleDateString('en-IN') : '') + '</span></div></div>';
+        return a;
+      }
+      function load(){
+        loading.style.display = 'block';
+        empty.style.display = 'none';
+        var path = currentFilter === 'resolved' ? '/complaints?status=resolved' : '/complaints';
+        window.MobileAPI.apiGet(path).then(function(r){
+          loading.style.display = 'none';
+          var data = r.data || [];
+          if (!data.length) { empty.style.display = 'block'; return; }
+          renderList(data);
+        }).catch(function(){ loading.style.display = 'none'; empty.style.display = 'block'; });
+      }
+      document.querySelectorAll('.segment-tab').forEach(function(tab){
+        tab.addEventListener('click', function(e){ e.preventDefault(); document.querySelectorAll('.segment-tab').forEach(function(t){ t.classList.remove('active'); }); tab.classList.add('active'); currentFilter = tab.getAttribute('data-status') || ''; load(); });
+      });
+      load();
+    })();
+  </script>
+</body>
+</html>

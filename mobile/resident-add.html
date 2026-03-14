@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <base href="/mobile/">
+  <title>Add Resident | SocietyHub</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link href="mobile.css" rel="stylesheet">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-bar">
+      <a href="residents.html" class="back-btn" aria-label="Back"><i class="fas fa-arrow-left"></i></a>
+      <h1 class="title">Add Resident</h1>
+    </header>
+    <main class="app-content no-tabs">
+      <form>
+        <div class="form-group">
+          <label>Name *</label>
+          <input type="text" placeholder="Full name" required>
+        </div>
+        <div class="form-group">
+          <label>Flat Number *</label>
+          <select required>
+            <option value="">Select flat</option>
+            <option>A-101</option>
+            <option>B-302</option>
+            <option>C-204</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="tel" placeholder="+91 98765 43210">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" placeholder="email@example.com">
+        </div>
+        <div class="form-group">
+          <label>Role</label>
+          <select>
+            <option>Owner</option>
+            <option>Tenant</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-block btn-primary">Add Resident</button>
+      </form>
+    </main>
+  </div>
+</body>
+</html>

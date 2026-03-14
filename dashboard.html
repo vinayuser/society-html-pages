@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | Society Management</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+  <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+  <div class="app-wrap">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <button type="button" class="sidebar-close" id="sidebarClose" aria-label="Close menu"><i class="fas fa-times"></i></button>
+      <div class="sidebar-brand"><i class="fas fa-building"></i> SocietyHub</div>
+      <nav>
+        <div class="nav-section">Main</div>
+        <a href="dashboard.html" class="nav-link active"><i class="fas fa-th-large"></i> Dashboard</a>
+        <a href="residents.html" class="nav-link"><i class="fas fa-users"></i> Residents</a>
+        <a href="visitors.html" class="nav-link"><i class="fas fa-user-friends"></i> Visitors</a>
+        <a href="complaints.html" class="nav-link"><i class="fas fa-exclamation-circle"></i> Complaints</a>
+        <a href="notices.html" class="nav-link"><i class="fas fa-bullhorn"></i> Notices</a>
+        <div class="nav-section">Operations</div>
+        <a href="#" class="nav-link"><i class="fas fa-file-invoice-dollar"></i> Maintenance & Billing</a>
+        <a href="vendors.html" class="nav-link"><i class="fas fa-store"></i> Vendor Marketplace</a>
+        <a href="deliveries.html" class="nav-link"><i class="fas fa-box"></i> Deliveries</a>
+        <a href="marketplace.html" class="nav-link"><i class="fas fa-shopping-bag"></i> Community Marketplace</a>
+        <a href="ads.html" class="nav-link"><i class="fas fa-ad"></i> Advertisements</a>
+        <a href="engagement.html" class="nav-link"><i class="fas fa-handshake"></i> Community Engagement</a>
+      </nav>
+    </aside>
+
+    <div class="main-content" style="flex:1; display:flex; flex-direction:column;">
+      <!-- Header -->
+      <header class="app-header">
+        <button type="button" class="btn btn-link d-lg-none p-0 border-0" id="sidebarToggler" aria-label="Open menu"><i class="fas fa-bars fa-lg"></i></button>
+        <a href="dashboard.html" class="logo"><i class="fas fa-building"></i> SocietyHub</a>
+        <div class="search-wrap position-relative">
+          <i class="fas fa-search position-absolute" style="left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted);"></i>
+          <input type="search" class="form-control" placeholder="Search..." aria-label="Search">
+        </div>
+        <div class="header-actions">
+          <a href="login.html" class="btn btn-outline-primary btn-sm me-2">Sign in</a>
+          <a href="signup.html" class="btn btn-primary btn-sm me-2">Create account</a>
+          <a href="#" class="btn-icon" title="Notifications"><i class="fas fa-bell"></i></a>
+          <div class="dropdown">
+            <button class="btn btn-link text-decoration-none text-dark dropdown-toggle p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <span class="d-inline-block rounded-circle bg-primary text-white text-center" style="width:36px; line-height:36px;">A</span>
+              <span class="ms-2 d-none d-md-inline">Admin</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Profile</a></li>
+              <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i> Settings</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+
+      <!-- Page content -->
+      <main class="flex-grow-1">
+        <h1 class="page-title">Dashboard</h1>
+        <p class="page-subtitle">Overview of your society activities</p>
+
+        <!-- Summary cards -->
+        <div class="row g-3 mb-4">
+          <div class="col-sm-6 col-lg-3">
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fas fa-users"></i></div>
+              <div class="stat-value">248</div>
+              <div class="stat-label">Total Residents</div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-lg-3">
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fas fa-user-friends"></i></div>
+              <div class="stat-value">12</div>
+              <div class="stat-label">Visitors Today</div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-lg-3">
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fas fa-exclamation-circle"></i></div>
+              <div class="stat-value">5</div>
+              <div class="stat-label">Open Complaints</div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-lg-3">
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fas fa-box"></i></div>
+              <div class="stat-value">3</div>
+              <div class="stat-label">Pending Deliveries</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-4">
+          <!-- Recent activities -->
+          <div class="col-lg-6">
+            <div class="card">
+              <div class="card-header">Recent Activities</div>
+              <div class="card-body p-0">
+                <ul class="activity-list">
+                  <li>
+                    <div class="activity-icon"><i class="fas fa-user-friends"></i></div>
+                    <div class="activity-body">
+                      <div class="activity-title">Visitor entry — John Doe</div>
+                      <div class="activity-meta">Flat B-302 • 10 min ago</div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="activity-icon"><i class="fas fa-exclamation-circle"></i></div>
+                    <div class="activity-body">
+                      <div class="activity-title">New complaint — Lift not working</div>
+                      <div class="activity-meta">Tower A • 25 min ago</div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="activity-icon"><i class="fas fa-box"></i></div>
+                    <div class="activity-body">
+                      <div class="activity-title">Delivery received — A-101</div>
+                      <div class="activity-meta">Courier • 1 hour ago</div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="activity-icon"><i class="fas fa-user-friends"></i></div>
+                    <div class="activity-body">
+                      <div class="activity-title">Visitor exit — Jane Smith</div>
+                      <div class="activity-meta">Flat C-204 • 2 hours ago</div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <!-- Announcements -->
+          <div class="col-lg-6">
+            <div class="card">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Announcements</span>
+                <a href="notices.html" class="btn btn-sm btn-outline-primary">View all</a>
+              </div>
+              <div class="card-body">
+                <div class="notice-card mb-3">
+                  <h6 class="mb-1">Society meeting – 15th March</h6>
+                  <p class="text-muted small mb-0">Annual general body meeting at 6 PM in the clubhouse. All residents are requested to attend.</p>
+                  <small class="text-muted">Posted 2 days ago</small>
+                </div>
+                <div class="notice-card mb-0">
+                  <h6 class="mb-1">Water supply maintenance</h6>
+                  <p class="text-muted small mb-0">Water supply will be suspended from 9 AM to 2 PM on 12th March for pipeline work.</p>
+                  <small class="text-muted">Posted 4 days ago</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.getElementById('sidebarToggler')?.addEventListener('click', function() {
+      document.getElementById('sidebar').classList.add('show');
+      document.getElementById('sidebarOverlay').classList.add('show');
+    });
+    document.getElementById('sidebarClose')?.addEventListener('click', closeSidebar);
+    document.getElementById('sidebarOverlay')?.addEventListener('click', closeSidebar);
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.remove('show');
+      document.getElementById('sidebarOverlay').classList.remove('show');
+    }
+  </script>
+</body>
+</html>

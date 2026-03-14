@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2563EB">
+  <base href="/mobile/">
+  <title>Your Deliveries | SocietyHub</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link href="mobile.css" rel="stylesheet">
+</head>
+<body>
+  <script src="api.js"></script>
+  <script src="auth-gate.js"></script>
+  <div class="app-shell">
+    <header class="app-bar">
+      <span class="title">Your deliveries</span>
+      <button type="button" class="icon-btn" aria-label="Notifications"><i class="fas fa-bell"></i></button>
+      <a href="profile.html" class="avatar">R</a>
+    </header>
+    <main class="app-content">
+      <p class="page-sub" style="margin-bottom:16px;">Parcels and deliveries for your flat.</p>
+      <div id="deliveriesLoading" class="empty-state" style="padding:24px; display:none;"><p class="es-text">Loading…</p></div>
+      <div id="deliveriesEmpty" class="empty-state" style="padding:24px; display:none;"><p class="es-text">No deliveries.</p></div>
+      <div id="deliveriesAtGate" style="display:none;"><div class="list-section-title" id="atGateTitle">At gate</div><div id="deliveriesAtGateList"></div></div>
+      <div id="deliveriesCollected" style="display:none;"><div class="list-section-title" id="collectedTitle">Collected</div><div id="deliveriesCollectedList"></div></div>
+    </main>
+    <nav class="tab-bar">
+      <a href="index.html"><i class="fas fa-home"></i><span>Home</span></a>
+      <a href="visitors.html"><i class="fas fa-user-friends"></i><span>Visitors</span></a>
+      <a href="deliveries.html" class="active"><i class="fas fa-box"></i><span>Deliveries</span></a>
+      <a href="complaints.html"><i class="fas fa-exclamation-circle"></i><span>Complaints</span></a>
+      <a href="more.html"><i class="fas fa-ellipsis-h"></i><span>More</span></a>
+    </nav>
+  </div>
+  <script>
+    (function(){
+      var loading = document.getElementById('deliveriesLoading');
+      var empty = document.getElementById('deliveriesEmpty');
+      var atGateWrap = document.getElementById('deliveriesAtGate');
+      var collectedWrap = document.getElementById('deliveriesCollected');
+      var atGateTitle = document.getElementById('atGateTitle');
+      var collectedTitle = document.getElementById('collectedTitle');
+      var atGateList = document.getElementById('deliveriesAtGateList');
+      var collectedList = document.getElementById('deliveriesCollectedList');
+      loading.style.display = 'block';
+      window.MobileAPI.apiGet('/deliveries').then(function(r){
+        loading.style.display = 'none';
+        var data = r.data || [];
+        if (!data.length) { empty.style.display = 'block'; return; }
+        var atGate = data.filter(function(d){ return d.status !== 'collected'; });
+        var collected = data.filter(function(d){ return d.status === 'collected'; });
+        if (atGate.length) {
+          atGateWrap.style.display = 'block';
+          atGateTitle.textContent = 'At gate (' + atGate.length + ')';
+          atGate.forEach(function(d){
+            var card = document.createElement('div');
+            card.className = 'info-card accent-warning';
+            var recv = d.receivedAt ? new Date(d.receivedAt).toLocaleString('en-IN') : '';
+            card.innerHTML = '<div class="ic-header"><h3 class="ic-title">' + (d.deliveryType || 'Delivery') + ' · ' + (d.flatLabel || d.tower + '-' + d.flatNumber) + '</h3><span class="ic-badge at-gate">' + (d.status || 'At gate') + '</span></div><div class="ic-meta">Received ' + recv + '</div><div class="ic-footer"><span class="ic-time"></span><button type="button" class="btn-add collect-btn" style="padding:8px 14px; font-size:0.85rem;" data-id="' + d.id + '">Collect</button></div>';
+            atGateList.appendChild(card);
+          });
+        }
+        if (collected.length) {
+          collectedWrap.style.display = 'block';
+          collectedTitle.textContent = 'Collected';
+          collected.forEach(function(d){
+            var card = document.createElement('div');
+            card.className = 'info-card accent-success';
+            var recv = d.receivedAt ? new Date(d.receivedAt).toLocaleString('en-IN') : '';
+            var coll = d.collectedAt ? new Date(d.collectedAt).toLocaleString('en-IN') : '';
+            card.innerHTML = '<div class="ic-header"><h3 class="ic-title">' + (d.deliveryType || 'Delivery') + '</h3><span class="ic-badge collected">Collected</span></div><div class="ic-meta">Received ' + recv + (coll ? ' · Collected ' + coll : '') + '</div>';
+            collectedList.appendChild(card);
+          });
+        }
+        atGateList.querySelectorAll('.collect-btn').forEach(function(btn){
+          btn.addEventListener('click', function(){
+            var id = btn.getAttribute('data-id');
+            btn.disabled = true;
+            window.MobileAPI.apiPatch('/deliveries/' + id + '/status', { status: 'collected' }).then(function(){ window.location.reload(); }).catch(function(){ btn.disabled = false; });
+          });
+        });
+      }).catch(function(){ loading.style.display = 'none'; empty.style.display = 'block'; });
+    })();
+  </script>
+</body>
+</html>

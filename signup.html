@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create account | SocietyHub</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+  <style>
+    .auth-page { min-height: 100vh; background: var(--bg-body); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
+    .auth-card { max-width: 440px; width: 100%; border-radius: var(--radius); background: var(--bg-card); box-shadow: var(--shadow); border: 1px solid var(--border); padding: 2rem; }
+    .auth-page .logo-wrap { width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(145deg, var(--primary), var(--primary-dark)); color: #fff; font-size: 1.75rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
+    .auth-page h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--text); text-align: center; }
+    .auth-page .sub { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; text-align: center; }
+    .auth-page .form-label { font-weight: 600; color: var(--text); }
+    .auth-page .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 0.2rem rgba(47, 128, 237, 0.2); }
+    .auth-page .btn-primary { width: 100%; padding: 0.75rem 1rem; font-weight: 600; }
+    .auth-page .back-link { display: inline-block; margin-bottom: 1rem; color: var(--primary); font-weight: 600; text-decoration: none; }
+    .auth-page .back-link:hover { color: var(--primary-dark); }
+    .auth-page .error-msg { color: var(--danger, #dc3545); font-size: 0.9rem; margin-top: 0.5rem; display: none; }
+    .auth-page .error-msg.show { display: block; }
+    .auth-page .success-card { display: none; text-align: center; }
+    .auth-page .success-card.show { display: block; }
+    .auth-page .form-card.hide { display: none; }
+  </style>
+</head>
+<body>
+  <div class="auth-page">
+    <a href="login.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to sign in</a>
+    <div class="logo-wrap"><i class="fas fa-building"></i></div>
+    <h1>Create account</h1>
+    <p class="sub">Request to join your society. Admin will approve before you can sign in.</p>
+
+    <div class="auth-card" id="formCard">
+      <form id="signupForm">
+        <div class="mb-3">
+          <label for="societyId" class="form-label">Society *</label>
+          <select id="societyId" class="form-select" required>
+            <option value="">Select your society</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="name" class="form-label">Full name *</label>
+          <input type="text" id="name" class="form-control" placeholder="Your name" required>
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Email *</label>
+          <input type="email" id="email" class="form-control" placeholder="you@example.com" required autocomplete="email">
+        </div>
+        <div class="mb-3">
+          <label for="phone" class="form-label">Phone (optional)</label>
+          <input type="tel" id="phone" class="form-control" placeholder="+91 98765 43210" autocomplete="tel">
+        </div>
+        <div class="mb-3">
+          <label for="tower" class="form-label">Tower / Block *</label>
+          <select id="tower" class="form-select" required disabled>
+            <option value="">Select society first</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="flatId" class="form-label">Flat *</label>
+          <select id="flatId" class="form-select" required disabled>
+            <option value="">Select tower first</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">Password * (min 6 characters)</label>
+          <input type="password" id="password" class="form-control" placeholder="••••••••" required minlength="6" autocomplete="new-password">
+        </div>
+        <p id="formError" class="error-msg"></p>
+        <button type="submit" class="btn btn-primary" id="submitBtn">Submit request</button>
+      </form>
+    </div>
+
+    <div class="auth-card success-card" id="successCard">
+      <p class="text-success mb-3" id="successMsg">Request submitted. Society admin will review. You can sign in after approval.</p>
+      <a href="login.html" class="btn btn-outline-secondary">Go to sign in</a>
+    </div>
+  </div>
+  <script>
+    (function () {
+      window.API_BASE = window.API_BASE || 'http://localhost:3000';
+      var base = (window.API_BASE || '').replace(/\/$/, '');
+      function url(path) {
+        var p = (path || '').replace(/^\//, '');
+        return base ? base + '/' + p : path;
+      }
+      var societySelect = document.getElementById('societyId');
+      var towerSelect = document.getElementById('tower');
+      var flatSelect = document.getElementById('flatId');
+      var signupFlats = [];
+
+      function loadTowers(societyId) {
+        towerSelect.innerHTML = '<option value="">Select tower / block</option>';
+        flatSelect.innerHTML = '<option value="">Select tower first</option>';
+        flatSelect.disabled = true;
+        if (!societyId) { towerSelect.disabled = true; return; }
+        towerSelect.disabled = false;
+        fetch(url('/societies/' + societyId + '/towers'))
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            if (data.success && data.data && data.data.length) {
+              data.data.forEach(function (t) {
+                var o = document.createElement('option');
+                o.value = t;
+                o.textContent = t;
+                towerSelect.appendChild(o);
+              });
+            }
+          })
+          .catch(function () { towerSelect.innerHTML = '<option value="">Unable to load</option>'; });
+      }
+
+      function loadFlats(societyId, tower) {
+        flatSelect.innerHTML = '<option value="">Loading…</option>';
+        flatSelect.disabled = true;
+        var q = tower ? '?tower=' + encodeURIComponent(tower) : '';
+        fetch(url('/societies/' + societyId + '/flats' + q))
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            signupFlats = data.success && data.data ? data.data : [];
+            flatSelect.innerHTML = '<option value="">Select flat</option>';
+            signupFlats.forEach(function (f) {
+              var o = document.createElement('option');
+              o.value = f.id;
+              o.textContent = f.tower + ' – ' + (f.flatNumber || f.flat_number || '');
+              o.dataset.tower = f.tower;
+              o.dataset.flatNumber = f.flatNumber || f.flat_number || '';
+              flatSelect.appendChild(o);
+            });
+            flatSelect.disabled = signupFlats.length === 0;
+          })
+          .catch(function () {
+            flatSelect.innerHTML = '<option value="">Unable to load</option>';
+          });
+      }
+
+      societySelect.addEventListener('change', function () {
+        var sid = societySelect.value ? parseInt(societySelect.value, 10) : null;
+        loadTowers(sid);
+      });
+
+      towerSelect.addEventListener('change', function () {
+        var sid = societySelect.value ? parseInt(societySelect.value, 10) : null;
+        var t = towerSelect.value || '';
+        if (!sid) return;
+        loadFlats(sid, t);
+      });
+
+      fetch(url('/societies/list'))
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (data.success && data.data && data.data.length) {
+            data.data.forEach(function (s) {
+              var o = document.createElement('option');
+              o.value = s.id;
+              o.textContent = s.name + (s.alias ? ' (' + s.alias + ')' : '');
+              societySelect.appendChild(o);
+            });
+          } else {
+            societySelect.innerHTML = '<option value="">No societies available</option>';
+          }
+        })
+        .catch(function () {
+          societySelect.innerHTML = '<option value="">Unable to load societies</option>';
+        });
+
+      document.getElementById('signupForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        var err = document.getElementById('formError');
+        var btn = document.getElementById('submitBtn');
+        err.classList.remove('show');
+        err.textContent = '';
+        var societyId = parseInt(document.getElementById('societyId').value, 10);
+        var name = document.getElementById('name').value.trim();
+        var email = document.getElementById('email').value.trim();
+        var phone = document.getElementById('phone').value.trim();
+        var flatOpt = flatSelect.options[flatSelect.selectedIndex];
+        var tower = flatOpt && flatOpt.dataset ? flatOpt.dataset.tower : '';
+        var flatNumber = flatOpt && flatOpt.dataset ? flatOpt.dataset.flatNumber : '';
+        var password = document.getElementById('password').value;
+        if (!societyId || !name || !email || !tower || !flatNumber || !password || password.length < 6) {
+          err.textContent = 'Please fill all required fields including Society, Tower and Flat. Password min 6 characters.';
+          err.classList.add('show');
+          return;
+        }
+        btn.disabled = true;
+        btn.textContent = 'Submitting…';
+        fetch(url('/signup-requests'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            societyId: societyId,
+            name: name,
+            email: email,
+            phone: phone || undefined,
+            tower: tower,
+            flatNumber: flatNumber,
+            password: password,
+          }),
+        })
+          .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
+          .then(function (result) {
+            if (result.ok && result.data.success) {
+              document.getElementById('formCard').classList.add('hide');
+              document.getElementById('successCard').classList.add('show');
+              if (result.data.data && result.data.data.message) {
+                document.getElementById('successMsg').textContent = result.data.data.message;
+              }
+            } else {
+              err.textContent = (result.data && result.data.message) || 'Request failed. Try again.';
+              err.classList.add('show');
+              btn.disabled = false;
+              btn.textContent = 'Submit request';
+            }
+          })
+          .catch(function () {
+            err.textContent = 'Network error. Please try again.';
+            err.classList.add('show');
+            btn.disabled = false;
+            btn.textContent = 'Submit request';
+          });
+      });
+    })();
+  </script>
+</body>
+</html>

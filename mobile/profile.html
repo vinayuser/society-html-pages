@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2563EB">
+  <base href="/mobile/">
+  <title>My profile | SocietyHub</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link href="mobile.css" rel="stylesheet">
+</head>
+<body>
+  <script src="api.js"></script>
+  <script src="auth-gate.js"></script>
+  <div class="app-shell">
+    <header class="app-bar">
+      <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+      <h1 class="title">My profile</h1>
+    </header>
+    <main class="app-content no-tabs">
+      <div id="profileLoading" class="empty-state" style="padding:24px;"><p class="es-text">Loading…</p></div>
+      <div id="profileContent" style="display:none;">
+        <div style="text-align:center; padding:24px 0;">
+          <div id="profileAvatar" style="width:80px; height:80px; border-radius:50%; background:linear-gradient(135deg, var(--primary), #60a5fa); color:#fff; font-size:2rem; font-weight:700; display:inline-flex; align-items:center; justify-content:center; margin:0 auto;">R</div>
+          <h2 class="page-heading" style="margin:12px 0 4px 0;" id="profileName"></h2>
+          <p class="page-sub" style="margin:0;" id="profileFlats"></p>
+        </div>
+        <div class="profile-block">
+          <div class="pb-title">Contact</div>
+          <div class="profile-row"><span class="pr-label">Phone</span><span class="pr-value" id="profilePhone"></span></div>
+          <div class="profile-row"><span class="pr-label">Email</span><span class="pr-value" id="profileEmail"></span></div>
+          <div class="profile-row"><span class="pr-label">Role</span><span class="pr-value" id="profileRole"></span></div>
+        </div>
+        <div class="profile-block" id="profileFlatsBlock" style="display:none;">
+          <div class="pb-title">My flats</div>
+          <div id="profileFlatsList"></div>
+        </div>
+        <div class="profile-block">
+          <div class="pb-title">Society</div>
+          <div class="profile-row"><span class="pr-label">Society</span><span class="pr-value" id="profileSociety"></span></div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script>
+    (function(){
+      window.MobileAPI.apiGet('/app/profile').then(function(r){
+        var p = r.data;
+        document.getElementById('profileLoading').style.display = 'none';
+        document.getElementById('profileContent').style.display = 'block';
+        var initial = (p.name || 'R').trim().charAt(0).toUpperCase();
+        document.getElementById('profileAvatar').textContent = initial;
+        document.getElementById('profileName').textContent = p.name || '';
+        document.getElementById('profilePhone').textContent = p.phone || '—';
+        document.getElementById('profileEmail').textContent = p.email || '—';
+        document.getElementById('profileRole').textContent = p.role || '—';
+        document.getElementById('profileSociety').textContent = p.societyName || p.societyAlias || '—';
+        var flats = p.flats || [];
+        if (flats.length) {
+          document.getElementById('profileFlatsBlock').style.display = 'block';
+          var flatLabels = flats.map(function(f){ return (f.tower || '') + '-' + (f.flatNumber || ''); }).filter(Boolean);
+          document.getElementById('profileFlats').innerHTML = '<i class="fas fa-home"></i> ' + flatLabels.join(', ') + (p.societyName ? ' · ' + p.societyName : '');
+          var list = document.getElementById('profileFlatsList');
+          flats.forEach(function(f){ var row = document.createElement('div'); row.className = 'profile-row'; row.innerHTML = '<span class="pr-label">' + (f.tower || '') + '-' + (f.flatNumber || '') + '</span><span class="pr-value">' + (f.isPrimary ? 'Primary' : '') + '</span>'; list.appendChild(row); });
+        }
+      }).catch(function(){ document.getElementById('profileLoading').querySelector('.es-text').textContent = 'Unable to load profile.'; });
+    })();
+  </script>
+</body>
+</html>

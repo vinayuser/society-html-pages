@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2563EB">
+  <base href="/mobile/">
+  <title>Invite visitor | SocietyHub</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link href="mobile.css" rel="stylesheet">
+</head>
+<body>
+  <script src="api.js"></script>
+  <script src="auth-gate.js"></script>
+  <div class="app-shell">
+    <header class="app-bar">
+      <a href="visitors.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+      <h1 class="title">Invite visitor</h1>
+    </header>
+    <main class="app-content no-tabs">
+      <p class="page-sub" style="margin-bottom:20px;">Log a visitor entry for your flat.</p>
+      <div id="noFlats" class="empty-state" style="padding:24px; display:none;"><p class="es-text">No flat assigned to your account.</p></div>
+      <form id="inviteForm" style="display:none;">
+        <div class="form-group" id="flatSelectWrap">
+          <label>Flat *</label>
+          <select id="flatId" required></select>
+        </div>
+        <div class="form-group">
+          <label>Visitor name *</label>
+          <input type="text" id="visitorName" placeholder="Full name" required>
+        </div>
+        <div class="form-group">
+          <label>Phone (optional)</label>
+          <input type="tel" id="visitorPhone" placeholder="+91 98765 43210">
+        </div>
+        <div class="form-group">
+          <label>Purpose</label>
+          <select id="purpose">
+            <option value="">Select</option>
+            <option value="Personal visit">Personal visit</option>
+            <option value="Delivery">Delivery</option>
+            <option value="Service / repair">Service / repair</option>
+            <option value="Guest">Guest</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Visitor type</label>
+          <select id="visitorType">
+            <option value="guest">Guest</option>
+            <option value="delivery">Delivery</option>
+            <option value="vendor">Vendor</option>
+          </select>
+        </div>
+        <p id="formError" style="color:var(--danger); font-size:0.9rem; display:none;"></p>
+        <button type="submit" class="btn-block btn-primary" id="submitBtn">Log visitor</button>
+      </form>
+    </main>
+  </div>
+  <script>
+    (function(){
+      var form = document.getElementById('inviteForm');
+      var noFlats = document.getElementById('noFlats');
+      var flatSelect = document.getElementById('flatId');
+      window.MobileAPI.apiGet('/app/my-flats').then(function(r){
+        var flats = r.data || [];
+        if (!flats.length) { noFlats.style.display = 'block'; return; }
+        form.style.display = 'block';
+        flats.forEach(function(f){ var o = document.createElement('option'); o.value = f.id; o.textContent = (f.tower || '') + '-' + (f.flatNumber || ''); flatSelect.appendChild(o); });
+      }).catch(function(){ noFlats.style.display = 'block'; noFlats.querySelector('.es-text').textContent = 'Unable to load flats.'; });
+      form.addEventListener('submit', function(e){
+        e.preventDefault();
+        var flatId = parseInt(flatSelect.value, 10);
+        var visitorName = document.getElementById('visitorName').value.trim();
+        var err = document.getElementById('formError');
+        var btn = document.getElementById('submitBtn');
+        if (!visitorName) { err.textContent = 'Enter visitor name.'; err.style.display = 'block'; return; }
+        err.style.display = 'none';
+        btn.disabled = true;
+        btn.textContent = 'Sending…';
+        window.MobileAPI.apiPost('/visitors/entry', {
+          flatId: flatId,
+          visitorName: visitorName,
+          visitorPhone: document.getElementById('visitorPhone').value.trim() || undefined,
+          purpose: document.getElementById('purpose').value || undefined,
+          visitorType: document.getElementById('visitorType').value || 'guest',
+        }).then(function(){ window.location.href = 'visitors.html'; }).catch(function(m){ err.textContent = m.message || 'Failed.'; err.style.display = 'block'; btn.disabled = false; btn.textContent = 'Log visitor'; });
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2563EB">
+  <base href="/mobile/">
+  <title>Notices | SocietyHub</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link href="mobile.css" rel="stylesheet">
+</head>
+<body>
+  <script src="api.js"></script>
+  <script src="auth-gate.js"></script>
+  <div class="app-shell">
+    <header class="app-bar">
+      <a href="more.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+      <h1 class="title">Notices</h1>
+    </header>
+    <main class="app-content no-tabs">
+      <p class="page-sub" style="margin-bottom:20px;">Society announcements and circulars.</p>
+      <div id="noticesLoading" class="empty-state" style="padding:24px; display:none;"><p class="es-text">Loading…</p></div>
+      <div id="noticesEmpty" class="empty-state" style="padding:24px; display:none;"><p class="es-text">No notices yet.</p></div>
+      <div id="noticesList"></div>
+    </main>
+  </div>
+  <script>
+    (function(){
+      var loading = document.getElementById('noticesLoading');
+      var empty = document.getElementById('noticesEmpty');
+      var list = document.getElementById('noticesList');
+      loading.style.display = 'block';
+      window.MobileAPI.apiGet('/notices').then(function(r){
+        loading.style.display = 'none';
+        var data = (r.data || []);
+        if (!data.length) { empty.style.display = 'block'; return; }
+        data.forEach(function(n){
+          var d = n.publishedAt || n.createdAt || '';
+          var dateStr = d ? new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+          var card = document.createElement('div');
+          card.className = 'notice-card';
+          card.innerHTML = '<div class="nc-badge">Notice</div><h3 class="nc-title">' + (n.title || '').replace(/</g,'&lt;') + '</h3><p class="nc-body">' + (n.message || '').replace(/</g,'&lt;') + '</p><div class="nc-meta"><i class="fas fa-calendar"></i> ' + dateStr + '</div>';
+          list.appendChild(card);
+        });
+      }).catch(function(){ loading.style.display = 'none'; empty.style.display = 'block'; empty.querySelector('.es-text').textContent = 'Unable to load notices.'; });
+    })();
+  </script>
+</body>
+</html>

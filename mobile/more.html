@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#7c3aed">
+  <base href="/mobile/">
+  <title>More | SocietyHub</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link href="mobile.css" rel="stylesheet">
+</head>
+<body>
+  <script src="api.js"></script>
+  <script src="auth-gate.js"></script>
+  <div class="app-shell">
+    <header class="app-bar">
+      <a href="index.html" class="logo">SH</a>
+      <h1 class="title">More</h1>
+      <div class="notif-wrap">
+        <button type="button" class="icon-btn"><i class="fas fa-bell"></i></button>
+        <span class="notif-badge">2</span>
+      </div>
+      <a href="profile.html" class="avatar">R</a>
+    </header>
+    <main class="app-content">
+      <h1 class="page-heading">More</h1>
+      <p class="page-sub">Profile, directory, notices and society services</p>
+      <ul class="menu-list">
+        <li>
+          <a href="profile.html">
+            <span class="ml-icon"><i class="fas fa-user"></i></span>
+            <span class="ml-text"><span>My profile</span><div class="ml-desc">Flat B-302, contact details, family members</div></span>
+            <i class="fas fa-chevron-right ml-arrow"></i>
+          </a>
+        </li>
+        <li>
+          <a href="directory.html">
+            <span class="ml-icon"><i class="fas fa-address-book"></i></span>
+            <span class="ml-text"><span>Directory</span><div class="ml-desc">Security, office, emergency contacts</div></span>
+            <i class="fas fa-chevron-right ml-arrow"></i>
+          </a>
+        </li>
+        <li>
+          <a href="notices.html">
+            <span class="ml-icon"><i class="fas fa-bullhorn"></i></span>
+            <span class="ml-text"><span>Notices & announcements</span><div class="ml-desc">Society updates and circulars</div></span>
+            <i class="fas fa-chevron-right ml-arrow"></i>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <span class="ml-icon"><i class="fas fa-file-invoice-dollar"></i></span>
+            <span class="ml-text"><span>Maintenance & billing</span><div class="ml-desc">Dues, payment history, download receipts</div></span>
+            <i class="fas fa-chevron-right ml-arrow"></i>
+          </a>
+        </li>
+        <li>
+          <a href="vendors.html">
+            <span class="ml-icon"><i class="fas fa-store"></i></span>
+            <span class="ml-text"><span>Vendor marketplace</span><div class="ml-desc">Approved plumbers, electricians, cleaners</div></span>
+            <i class="fas fa-chevron-right ml-arrow"></i>
+          </a>
+        </li>
+        <li>
+          <a href="marketplace.html">
+            <span class="ml-icon"><i class="fas fa-shopping-bag"></i></span>
+            <span class="ml-text"><span>Community marketplace</span><div class="ml-desc">Buy and sell with neighbours</div></span>
+            <i class="fas fa-chevron-right ml-arrow"></i>
+          </a>
+        </li>
+        <li>
+          <a href="engagement.html">
+            <span class="ml-icon"><i class="fas fa-handshake"></i></span>
+            <span class="ml-text"><span>Community</span><div class="ml-desc">Lost & found, polls, events</div></span>
+            <i class="fas fa-chevron-right ml-arrow"></i>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <span class="ml-icon"><i class="fas fa-cog"></i></span>
+            <span class="ml-text"><span>Settings</span><div class="ml-desc">Notifications, language, privacy</div></span>
+            <i class="fas fa-chevron-right ml-arrow"></i>
+          </a>
+        </li>
+      </ul>
+      <div style="margin-top:24px; padding:20px; text-align:center;">
+        <a href="#" style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Log out</a>
+      </div>
+    </main>
+    <nav class="tab-bar">
+      <a href="index.html"><i class="fas fa-home"></i><span>Home</span></a>
+      <a href="activity.html"><i class="fas fa-clock"></i><span>Activity</span></a>
+      <a href="visitors.html"><i class="fas fa-user-friends"></i><span>Visitors</span></a>
+      <a href="more.html" class="active"><i class="fas fa-ellipsis-h"></i><span>More</span></a>
+    </nav>
+  </div>
+  <script>
+    document.getElementById('logoutLink').addEventListener('click', function(e){ e.preventDefault(); window.MobileAPI.logout(); });
+  </script>
+</body>
+</html>

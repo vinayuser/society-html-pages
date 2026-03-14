@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#7c3aed">
+  <base href="/mobile/">
+  <title>Your Visitors | SocietyHub</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link href="mobile.css" rel="stylesheet">
+</head>
+<body>
+  <script src="api.js"></script>
+  <script src="auth-gate.js"></script>
+  <div class="app-shell">
+    <header class="app-bar">
+      <a href="index.html" class="logo">SH</a>
+      <h1 class="title">Visitors</h1>
+      <div class="notif-wrap">
+        <button type="button" class="icon-btn"><i class="fas fa-bell"></i></button>
+        <span class="notif-badge">2</span>
+      </div>
+      <a href="profile.html" class="avatar">R</a>
+    </header>
+    <main class="app-content">
+      <p class="page-sub" style="margin-bottom:16px;">Pre-approve visitors and see who visited your flat.</p>
+      <div class="content-header">
+        <h1 class="page-heading" style="margin:0;">Visitors</h1>
+        <a href="visitor-invite.html" class="btn-add"><i class="fas fa-plus"></i> Invite</a>
+      </div>
+      <div id="visitorsLoading" class="empty-state" style="padding:24px; display:none;"><p class="es-text">Loading…</p></div>
+      <div id="visitorsEmpty" class="empty-state" style="padding:24px; display:none;"><p class="es-text">No visitors yet. Tap Invite to add one.</p></div>
+      <div id="visitorsList"></div>
+    </main>
+    <nav class="tab-bar">
+      <a href="index.html"><i class="fas fa-home"></i><span>Home</span></a>
+      <a href="activity.html"><i class="fas fa-clock"></i><span>Activity</span></a>
+      <a href="visitors.html" class="active"><i class="fas fa-user-friends"></i><span>Visitors</span></a>
+      <a href="more.html"><i class="fas fa-ellipsis-h"></i><span>More</span></a>
+    </nav>
+  </div>
+  <script>
+    (function(){
+      var loading = document.getElementById('visitorsLoading');
+      var empty = document.getElementById('visitorsEmpty');
+      var list = document.getElementById('visitorsList');
+      loading.style.display = 'block';
+      window.MobileAPI.apiGet('/visitors').then(function(r){
+        loading.style.display = 'none';
+        var data = r.data || [];
+        if (!data.length) { empty.style.display = 'block'; return; }
+        data.forEach(function(v){
+          var card = document.createElement('div');
+          card.className = 'info-card' + (v.exitTime ? '' : ' accent-primary');
+          var entryStr = v.entryTime ? new Date(v.entryTime).toLocaleString('en-IN', { timeStyle: 'short' }) : '';
+          var exitStr = v.exitTime ? new Date(v.exitTime).toLocaleString('en-IN', { timeStyle: 'short' }) : '';
+          var badge = v.exitTime ? '<span class="ic-badge exited">Exited</span>' : '<span class="ic-badge approved">Active</span>';
+          card.innerHTML = '<div class="ic-header"><h3 class="ic-title">' + (v.visitorName || '').replace(/</g,'&lt;') + '</h3>' + badge + '</div><div class="ic-meta">' + (v.purpose || 'Visit') + ' · ' + (v.flatLabel || v.tower + '-' + v.flatNumber) + '</div><div class="ic-detail">Entry ' + entryStr + (exitStr ? ' · Exit ' + exitStr : '') + '</div><div class="ic-footer"><span class="ic-time">' + (v.entryTime ? new Date(v.entryTime).toLocaleDateString('en-IN') : '') + '</span></div>';
+          list.appendChild(card);
+        });
+      }).catch(function(){ loading.style.display = 'none'; empty.style.display = 'block'; });
+    })();
+  </script>
+</body>
+</html>

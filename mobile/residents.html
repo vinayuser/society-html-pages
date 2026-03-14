@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2F80ED">
+  <base href="/mobile/">
+  <title>Residents | SocietyHub</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link href="mobile.css" rel="stylesheet">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-bar">
+      <span class="title">Residents</span>
+      <button type="button" class="icon-btn" aria-label="Notifications"><i class="fas fa-bell"></i></button>
+      <a href="#" class="avatar">A</a>
+    </header>
+    <main class="app-content">
+      <div class="content-header">
+        <h1 class="page-heading">Residents</h1>
+        <a href="resident-add.html" class="btn-add"><i class="fas fa-plus"></i> Add</a>
+      </div>
+      <div class="form-group" style="margin-bottom:12px;">
+        <input type="search" placeholder="Search residents..." style="padding:12px 14px; border:1px solid var(--border); border-radius:12px; width:100%; font-size:16px;">
+      </div>
+      <div class="list-section-title">By block</div>
+      <div class="chip-row">
+        <a href="#" class="chip active">All</a>
+        <a href="#" class="chip">A</a>
+        <a href="#" class="chip">B</a>
+        <a href="#" class="chip">C</a>
+      </div>
+      <ul class="card-list">
+        <li>
+          <div class="row-title">Ramesh Kumar</div>
+          <div class="row-meta">A-101 · ramesh@example.com</div>
+          <span class="row-badge badge-resolved" style="background:#d1fae5; color:#065f46;">Active</span>
+        </li>
+        <li>
+          <div class="row-title">Priya Sharma</div>
+          <div class="row-meta">B-302 · priya@example.com</div>
+          <span class="row-badge badge-resolved" style="background:#d1fae5; color:#065f46;">Active</span>
+        </li>
+        <li>
+          <div class="row-title">Amit Patel</div>
+          <div class="row-meta">C-204 · amit@example.com</div>
+          <span class="row-badge badge-exited">Inactive</span>
+        </li>
+      </ul>
+    </main>
+    <nav class="tab-bar">
+      <a href="index.html"><i class="fas fa-th-large"></i><span>Home</span></a>
+      <a href="residents.html" class="active"><i class="fas fa-users"></i><span>Residents</span></a>
+      <a href="visitors.html"><i class="fas fa-user-friends"></i><span>Visitors</span></a>
+      <a href="complaints.html"><i class="fas fa-exclamation-circle"></i><span>Complaints</span></a>
+      <a href="more.html"><i class="fas fa-ellipsis-h"></i><span>More</span></a>
+    </nav>
+  </div>
+</body>
+</html>

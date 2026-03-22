@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#7c3aed">
+  <base href="/mobile/">
+  <title>Settings | SocietyHub</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link href="mobile.css" rel="stylesheet">
+</head>
+<body>
+  <script src="api.js"></script>
+  <script src="auth-gate.js"></script>
+  <div class="app-shell">
+    <header class="app-bar">
+      <a href="more.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+      <h1 class="title">Settings</h1>
+    </header>
+    <main class="app-content no-tabs">
+      <p class="page-sub" style="margin-bottom:20px;">Preferences for your member account on this device.</p>
+      <div class="profile-block">
+        <div class="pb-title">Notifications</div>
+        <div class="profile-row">
+          <span class="pr-label">Show alerts in app</span>
+          <span class="pr-value"><input type="checkbox" id="prefNotif" checked aria-label="Notifications"></span>
+        </div>
+      </div>
+      <p style="font-size:0.8rem; color:var(--text-muted); margin-top:16px;">These options are stored only on this phone. Society-wide alerts still come from your society office.</p>
+      <div style="margin-top:28px;">
+        <button type="button" class="btn-block btn-primary" id="btnLogout">Log out</button>
+      </div>
+    </main>
+  </div>
+  <script>
+    (function () {
+      var k = 'mobile_pref_notif';
+      var cb = document.getElementById('prefNotif');
+      try { cb.checked = localStorage.getItem(k) !== '0'; } catch (e) {}
+      cb.addEventListener('change', function () {
+        try { localStorage.setItem(k, cb.checked ? '1' : '0'); } catch (e) {}
+      });
+      document.getElementById('btnLogout').addEventListener('click', function () {
+        window.MobileAPI.logout();
+      });
+    })();
+  </script>
+</body>
+</html>

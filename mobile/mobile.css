@@ -681,3 +681,96 @@ html, body {
 .tile .btn-call, .tile .btn-contact { display: block; width: 100%; margin-top: 8px; padding: 10px; text-align: center; font-size: 0.85rem; font-weight: 600; border-radius: var(--radius-sm); text-decoration: none; border: none; cursor: pointer; }
 .tile .btn-call { background: var(--primary); color: #fff; }
 .tile .btn-contact { background: var(--primary-light); color: var(--primary); }
+
+/* Ads — horizontal strip (home) + list page */
+.ads-home-wrap { margin-bottom: 4px; }
+.ads-scroll {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 4px 12px;
+  margin: 0 -4px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+.ads-scroll::-webkit-scrollbar { height: 6px; }
+.ads-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.ads-scroll-card {
+  flex: 0 0 78%;
+  max-width: 280px;
+  scroll-snap-align: start;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  color: inherit;
+  display: block;
+  cursor: default;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.ads-scroll-media {
+  aspect-ratio: 16 / 9;
+  background: #111;
+  position: relative;
+}
+.ads-media-kind {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.72);
+  color: #fff;
+  line-height: 1;
+  pointer-events: none;
+}
+.ads-media-kind.is-video {
+  background: rgba(124, 58, 237, 0.92);
+}
+.ads-media-kind.is-image {
+  background: rgba(30, 30, 30, 0.85);
+}
+.ads-scroll-media img,
+.ads-scroll-media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.ads-scroll-cap {
+  padding: 10px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text);
+}
+.ads-page-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 24px;
+}
+.ads-page-card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.ads-page-card .ads-scroll-media { aspect-ratio: 16 / 9; }
+.ads-page-card .ads-scroll-cap { padding: 12px 14px; }
+.ads-page-card .ads-meta {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  padding: 0 14px 12px;
+}

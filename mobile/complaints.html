@@ -80,7 +80,7 @@
         var path = currentFilter === 'resolved' ? '/complaints?status=resolved' : '/complaints';
         window.MobileAPI.apiGet(path).then(function(r){
           loading.style.display = 'none';
-          var data = r.data || [];
+          var data = window.MobileAPI.listFrom(r);
           if (!data.length) { empty.style.display = 'block'; return; }
           renderList(data);
         }).catch(function(){ loading.style.display = 'none'; empty.style.display = 'block'; });

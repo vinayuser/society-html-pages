@@ -46,7 +46,7 @@
       loading.style.display = 'block';
       window.MobileAPI.apiGet('/deliveries').then(function(r){
         loading.style.display = 'none';
-        var data = r.data || [];
+        var data = window.MobileAPI.listFrom(r);
         if (!data.length) { empty.style.display = 'block'; return; }
         var atGate = data.filter(function(d){ return d.status !== 'collected'; });
         var collected = data.filter(function(d){ return d.status === 'collected'; });

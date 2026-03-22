@@ -41,9 +41,9 @@
       var id = (new URLSearchParams(window.location.search).get('id')) || '';
       if (!id) { document.getElementById('detailLoading').style.display = 'none'; document.getElementById('detailError').style.display = 'block'; document.getElementById('detailError').querySelector('.es-text').textContent = 'Invalid complaint.'; return; }
       window.MobileAPI.apiGet('/complaints/' + id).then(function(r){
-        var c = r.data;
+        var c = window.MobileAPI.dataFrom(r);
         document.getElementById('detailLoading').style.display = 'none';
-        if (!c) { document.getElementById('detailError').style.display = 'block'; return; }
+        if (!c || (typeof c.id === 'undefined' && !c.title)) { document.getElementById('detailError').style.display = 'block'; return; }
         document.getElementById('detailContent').style.display = 'block';
         var statusClass = c.status === 'resolved' ? 'resolved' : 'in-progress';
         var statusLabel = c.status === 'resolved' ? 'Resolved' : (c.status === 'in_progress' ? 'In progress' : 'Open');

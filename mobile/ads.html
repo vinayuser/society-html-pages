@@ -3,32 +3,85 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#7c3aed">
   <base href="/mobile/">
   <title>Advertisements | SocietyHub</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
   <link href="mobile.css" rel="stylesheet">
 </head>
 <body>
+  <script src="api.js"></script>
+  <script src="auth-gate.js"></script>
   <div class="app-shell">
     <header class="app-bar">
       <a href="more.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
-      <h1 class="title">Ads</h1>
-      <button type="button" class="icon-btn"><i class="fas fa-plus"></i></button>
+      <h1 class="title">Advertisements</h1>
+      <span style="width:40px;"></span>
     </header>
     <main class="app-content no-tabs">
-      <ul class="card-list">
-        <li>
-          <div class="row-title">Banner</div>
-          <div class="row-meta">Mar 1 - Mar 31, 2026</div>
-          <span class="row-badge badge-resolved" style="background:#d1fae5; color:#065f46;">Active</span>
-        </li>
-        <li>
-          <div class="row-title">Sidebar</div>
-          <div class="row-meta">Feb 15 - Mar 15, 2026</div>
-          <span class="row-badge badge-exited">Ended</span>
-        </li>
-      </ul>
+      <p class="page-sub" style="margin-top:0;">Active promotions from your society</p>
+      <div id="adsLoading" class="text-muted small" style="padding:24px;text-align:center;">Loading…</div>
+      <div id="adsEmpty" class="text-muted small" style="padding:24px;text-align:center;display:none;">No active advertisements right now.</div>
+      <div class="ads-page-grid" id="adsGrid" style="display:none;"></div>
     </main>
   </div>
+  <script>
+    (function () {
+      var grid = document.getElementById('adsGrid');
+      var loading = document.getElementById('adsLoading');
+      var empty = document.getElementById('adsEmpty');
+      if (!window.MobileAPI || !grid) return;
+      window.MobileAPI.apiGet('/ads?visibleOnly=1&limit=50')
+        .then(function (raw) {
+          if (loading) loading.style.display = 'none';
+          var items = window.MobileAPI.listFrom(raw);
+          if (!items || !items.length) {
+            if (empty) empty.style.display = 'block';
+            return;
+          }
+          grid.style.display = 'flex';
+          items.forEach(function (ad) {
+            var src = window.MobileAPI.mediaUrl(ad.contentUrl);
+            var card = document.createElement('article');
+            card.className = 'ads-page-card';
+            var media = document.createElement('div');
+            media.className = 'ads-scroll-media';
+            if (window.MobileAPI.isVideoAd(ad)) {
+              var v = document.createElement('video');
+              v.src = src;
+              v.controls = true;
+              v.playsInline = true;
+              v.setAttribute('playsinline', '');
+              media.appendChild(v);
+            } else {
+              var im = document.createElement('img');
+              im.src = src;
+              im.alt = ad.title || '';
+              media.appendChild(im);
+            }
+            var kind = document.createElement('span');
+            kind.className = 'ads-media-kind ' + (window.MobileAPI.isVideoAd(ad) ? 'is-video' : 'is-image');
+            kind.textContent = window.MobileAPI.mediaKindLabel(ad);
+            kind.setAttribute('aria-label', 'Media type: ' + kind.textContent);
+            media.appendChild(kind);
+            var cap = document.createElement('div');
+            cap.className = 'ads-scroll-cap';
+            cap.textContent = ad.title || 'Promotion';
+            var meta = document.createElement('div');
+            meta.className = 'ads-meta';
+            var s = ad.startDate ? new Date(ad.startDate).toLocaleDateString() : '';
+            var e = ad.endDate ? new Date(ad.endDate).toLocaleDateString() : '';
+            meta.textContent = (s && e) ? (s + ' – ' + e) : '';
+            card.appendChild(media);
+            card.appendChild(cap);
+            if (meta.textContent) card.appendChild(meta);
+            grid.appendChild(card);
+          });
+        })
+        .catch(function () {
+          if (loading) loading.textContent = 'Could not load advertisements.';
+        });
+    })();
+  </script>
 </body>
 </html>

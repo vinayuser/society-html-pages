@@ -47,7 +47,7 @@
       loading.style.display = 'block';
       window.MobileAPI.apiGet('/visitors').then(function(r){
         loading.style.display = 'none';
-        var data = r.data || [];
+        var data = window.MobileAPI.listFrom(r);
         if (!data.length) { empty.style.display = 'block'; return; }
         data.forEach(function(v){
           var card = document.createElement('div');

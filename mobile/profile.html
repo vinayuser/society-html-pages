@@ -45,8 +45,9 @@
   <script>
     (function(){
       window.MobileAPI.apiGet('/app/profile').then(function(r){
-        var p = r.data;
+        var p = window.MobileAPI.dataFrom(r);
         document.getElementById('profileLoading').style.display = 'none';
+        if (!p) { document.getElementById('profileLoading').querySelector('.es-text').textContent = 'Unable to load profile.'; document.getElementById('profileLoading').style.display = 'block'; return; }
         document.getElementById('profileContent').style.display = 'block';
         var initial = (p.name || 'R').trim().charAt(0).toUpperCase();
         document.getElementById('profileAvatar').textContent = initial;

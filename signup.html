@@ -8,74 +8,141 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
   <link href="styles.css" rel="stylesheet">
   <style>
-    .auth-page { min-height: 100vh; background: var(--bg-body); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
-    .auth-card { max-width: 440px; width: 100%; border-radius: var(--radius); background: var(--bg-card); box-shadow: var(--shadow); border: 1px solid var(--border); padding: 2rem; }
+    .auth-page { min-height: 100vh; background: var(--bg-body); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem 1rem; }
+    .auth-wrap { max-width: 480px; width: 100%; }
     .auth-page .logo-wrap { width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(145deg, var(--primary), var(--primary-dark)); color: #fff; font-size: 1.75rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
     .auth-page h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--text); text-align: center; }
-    .auth-page .sub { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; text-align: center; }
-    .auth-page .form-label { font-weight: 600; color: var(--text); }
-    .auth-page .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 0.2rem rgba(47, 128, 237, 0.2); }
-    .auth-page .btn-primary { width: 100%; padding: 0.75rem 1rem; font-weight: 600; }
+    .auth-page .sub { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.25rem; text-align: center; }
     .auth-page .back-link { display: inline-block; margin-bottom: 1rem; color: var(--primary); font-weight: 600; text-decoration: none; }
     .auth-page .back-link:hover { color: var(--primary-dark); }
-    .auth-page .error-msg { color: var(--danger, #dc3545); font-size: 0.9rem; margin-top: 0.5rem; display: none; }
+
+    .auth-card { border-radius: var(--radius); background: var(--bg-card); box-shadow: var(--shadow); border: 1px solid var(--border); padding: 1.5rem 1.5rem 1.25rem; overflow: hidden; }
+
+    /* Step indicator */
+    .step-dots { display: flex; justify-content: center; gap: 0.35rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .step-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border); transition: background 0.35s ease, transform 0.35s ease; }
+    .step-dot.active { background: var(--primary); transform: scale(1.15); }
+    .step-dot.done { background: var(--primary); opacity: 0.45; }
+    .step-label { text-align: center; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 1rem; min-height: 1.25rem; transition: color 0.3s ease, opacity 0.3s ease; }
+    .step-label strong { color: var(--primary); font-weight: 700; }
+
+    /* Wizard slides */
+    .wizard-viewport { overflow: hidden; width: 100%; position: relative; }
+    .wizard-track {
+      display: flex;
+      width: 500%;
+      transition: transform 0.5s cubic-bezier(0.25, 0.85, 0.35, 1);
+      will-change: transform;
+    }
+    .wizard-slide {
+      flex: 0 0 20%;
+      width: 20%;
+      padding-right: 0.75rem;
+      box-sizing: border-box;
+      opacity: 0.35;
+      transition: opacity 0.45s ease;
+    }
+    .wizard-slide.is-current { opacity: 1; }
+
+    .auth-page .form-label { font-weight: 600; color: var(--text); font-size: 0.9rem; }
+    .auth-page .form-control:focus, .auth-page .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 0.2rem rgba(47, 128, 237, 0.2); }
+    .wizard-nav { display: flex; gap: 0.75rem; margin-top: 1.25rem; }
+    .wizard-nav .btn { flex: 1; padding: 0.65rem 1rem; font-weight: 600; }
+    .btn-primary-gradient {
+      background: linear-gradient(145deg, var(--primary), var(--primary-dark));
+      border: none;
+      color: #fff;
+    }
+    .btn-primary-gradient:hover { filter: brightness(1.05); color: #fff; }
+    .btn-primary-gradient:disabled { opacity: 0.65; }
+
+    .auth-page .error-msg { color: var(--danger, #dc3545); font-size: 0.9rem; margin-top: 0.75rem; display: none; }
     .auth-page .error-msg.show { display: block; }
-    .auth-page .success-card { display: none; text-align: center; }
-    .auth-page .success-card.show { display: block; }
-    .auth-page .form-card.hide { display: none; }
+    .success-card { display: none; text-align: center; padding: 2rem; }
+    .success-card.show { display: block; }
+    .form-card.hide { display: none; }
+
+    .location-summary { font-size: 0.85rem; color: var(--text-muted); background: rgba(47, 128, 237, 0.06); border-radius: 8px; padding: 0.65rem 0.85rem; margin-bottom: 1rem; border: 1px solid var(--border); }
   </style>
 </head>
 <body>
   <div class="auth-page">
-    <a href="login.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to sign in</a>
-    <div class="logo-wrap"><i class="fas fa-building"></i></div>
-    <h1>Create account</h1>
-    <p class="sub">Request to join your society. Admin will approve before you can sign in.</p>
+    <div class="auth-wrap">
+      <a href="login.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to sign in</a>
+      <div class="logo-wrap"><i class="fas fa-building"></i></div>
+      <h1>Create account</h1>
+      <p class="sub">Request to join your society. Admin will approve before you can sign in.</p>
 
-    <div class="auth-card" id="formCard">
-      <form id="signupForm">
-        <div class="mb-3">
-          <label for="societyId" class="form-label">Society *</label>
-          <select id="societyId" class="form-select" required>
-            <option value="">Select your society</option>
-          </select>
+      <div class="auth-card" id="formCard">
+        <div class="step-dots" id="stepDots" aria-hidden="true"></div>
+        <p class="step-label" id="stepLabel"></p>
+
+        <div class="wizard-viewport">
+          <div class="wizard-track" id="wizardTrack">
+            <!-- Step 0: Country -->
+            <div class="wizard-slide is-current" data-step="0">
+              <label for="countryId" class="form-label">Country *</label>
+              <select id="countryId" class="form-select form-select-lg mb-2">
+                <option value="">Loading countries…</option>
+              </select>
+              <p class="small text-muted mb-0">Select your country to find societies in your area.</p>
+            </div>
+            <!-- Step 1: State -->
+            <div class="wizard-slide" data-step="1">
+              <label for="stateId" class="form-label">State / Province *</label>
+              <select id="stateId" class="form-select form-select-lg mb-2" disabled>
+                <option value="">Select country first</option>
+              </select>
+            </div>
+            <!-- Step 2: City -->
+            <div class="wizard-slide" data-step="2">
+              <label for="cityId" class="form-label">City *</label>
+              <select id="cityId" class="form-select form-select-lg mb-2" disabled>
+                <option value="">Select state first</option>
+              </select>
+            </div>
+            <!-- Step 3: Society -->
+            <div class="wizard-slide" data-step="3">
+              <div class="location-summary" id="locationSummary"></div>
+              <label for="societyId" class="form-label">Society *</label>
+              <select id="societyId" class="form-select form-select-lg mb-2" disabled>
+                <option value="">Select city first</option>
+              </select>
+            </div>
+            <!-- Step 4: Details + flat + password -->
+            <div class="wizard-slide" data-step="4">
+              <label for="name" class="form-label">Full name *</label>
+              <input type="text" id="name" class="form-control mb-2" placeholder="Your name" autocomplete="name">
+              <label for="email" class="form-label">Email *</label>
+              <input type="email" id="email" class="form-control mb-2" placeholder="you@example.com" autocomplete="email">
+              <label for="phone" class="form-label">Phone (optional)</label>
+              <input type="tel" id="phone" class="form-control mb-2" placeholder="+91 98765 43210" autocomplete="tel">
+              <label for="tower" class="form-label">Tower / Block *</label>
+              <select id="tower" class="form-select mb-2" disabled>
+                <option value="">Select society first</option>
+              </select>
+              <label for="flatId" class="form-label">Flat *</label>
+              <select id="flatId" class="form-select mb-2" disabled>
+                <option value="">Select tower first</option>
+              </select>
+              <label for="password" class="form-label">Password * (min 6 characters)</label>
+              <input type="password" id="password" class="form-control" placeholder="••••••••" minlength="6" autocomplete="new-password">
+            </div>
+          </div>
         </div>
-        <div class="mb-3">
-          <label for="name" class="form-label">Full name *</label>
-          <input type="text" id="name" class="form-control" placeholder="Your name" required>
-        </div>
-        <div class="mb-3">
-          <label for="email" class="form-label">Email *</label>
-          <input type="email" id="email" class="form-control" placeholder="you@example.com" required autocomplete="email">
-        </div>
-        <div class="mb-3">
-          <label for="phone" class="form-label">Phone (optional)</label>
-          <input type="tel" id="phone" class="form-control" placeholder="+91 98765 43210" autocomplete="tel">
-        </div>
-        <div class="mb-3">
-          <label for="tower" class="form-label">Tower / Block *</label>
-          <select id="tower" class="form-select" required disabled>
-            <option value="">Select society first</option>
-          </select>
-        </div>
-        <div class="mb-3">
-          <label for="flatId" class="form-label">Flat *</label>
-          <select id="flatId" class="form-select" required disabled>
-            <option value="">Select tower first</option>
-          </select>
-        </div>
-        <div class="mb-3">
-          <label for="password" class="form-label">Password * (min 6 characters)</label>
-          <input type="password" id="password" class="form-control" placeholder="••••••••" required minlength="6" autocomplete="new-password">
-        </div>
+
         <p id="formError" class="error-msg"></p>
-        <button type="submit" class="btn btn-primary" id="submitBtn">Submit request</button>
-      </form>
-    </div>
+        <div class="wizard-nav">
+          <button type="button" class="btn btn-outline-secondary" id="btnBack" style="display:none;">Back</button>
+          <button type="button" class="btn btn-primary-gradient" id="btnNext">Continue</button>
+        </div>
+      </div>
 
-    <div class="auth-card success-card" id="successCard">
-      <p class="text-success mb-3" id="successMsg">Request submitted. Society admin will review. You can sign in after approval.</p>
-      <a href="login.html" class="btn btn-outline-secondary">Go to sign in</a>
+      <div class="auth-card success-card" id="successCard">
+        <div class="logo-wrap mx-auto mb-3"><i class="fas fa-check"></i></div>
+        <p class="text-success mb-3" id="successMsg">Request submitted. Society admin will review. You can sign in after approval.</p>
+        <a href="login.html" class="btn btn-outline-secondary w-100">Go to sign in</a>
+      </div>
     </div>
   </div>
   <script>
@@ -86,55 +153,246 @@
         var p = (path || '').replace(/^\//, '');
         return base ? base + '/' + p : path;
       }
+
+      function listFromResponse(data) {
+        if (!data || !data.success) return [];
+        if (data.Collection && Array.isArray(data.Collection.data)) return data.Collection.data;
+        if (Array.isArray(data.data)) return data.data;
+        return [];
+      }
+
+      function fetchList(apiPath) {
+        return fetch(url(apiPath)).then(function (r) { return r.json(); }).then(listFromResponse);
+      }
+
+      var TOTAL_STEPS = 5;
+      var stepTitles = [
+        'Step 1 of 5 — Country',
+        'Step 2 of 5 — State',
+        'Step 3 of 5 — City',
+        'Step 4 of 5 — Society',
+        'Step 5 of 5 — Your details & flat'
+      ];
+
+      var currentStep = 0;
+      var track = document.getElementById('wizardTrack');
+      var btnNext = document.getElementById('btnNext');
+      var btnBack = document.getElementById('btnBack');
+      var stepLabel = document.getElementById('stepLabel');
+      var slides = track.querySelectorAll('.wizard-slide');
+
+      var countrySelect = document.getElementById('countryId');
+      var stateSelect = document.getElementById('stateId');
+      var citySelect = document.getElementById('cityId');
       var societySelect = document.getElementById('societyId');
       var towerSelect = document.getElementById('tower');
       var flatSelect = document.getElementById('flatId');
-      var signupFlats = [];
+      var locationSummary = document.getElementById('locationSummary');
+
+      var dotsWrap = document.getElementById('stepDots');
+      for (var d = 0; d < TOTAL_STEPS; d++) {
+        var dot = document.createElement('span');
+        dot.className = 'step-dot' + (d === 0 ? ' active' : '');
+        dot.setAttribute('aria-label', 'Step ' + (d + 1));
+        dotsWrap.appendChild(dot);
+      }
+      var dots = dotsWrap.querySelectorAll('.step-dot');
+
+      function updateDots() {
+        for (var i = 0; i < dots.length; i++) {
+          dots[i].classList.remove('active', 'done');
+          if (i < currentStep) dots[i].classList.add('done');
+          else if (i === currentStep) dots[i].classList.add('active');
+        }
+      }
+
+      function updateSlideOpacity() {
+        for (var i = 0; i < slides.length; i++) {
+          slides[i].classList.toggle('is-current', i === currentStep);
+        }
+      }
+
+      function goToStep(i) {
+        currentStep = Math.max(0, Math.min(TOTAL_STEPS - 1, i));
+        track.style.transform = 'translateX(-' + (currentStep * 20) + '%)';
+        updateDots();
+        updateSlideOpacity();
+        var raw = stepTitles[currentStep];
+        var segs = raw.split(' — ');
+        var head = segs[0].replace(/Step (\d+) of (\d+)/, '<strong>Step $1</strong> of $2');
+        stepLabel.innerHTML = segs.length > 1 ? head + ' — ' + escapeHtml(segs[1]) : head;
+        btnBack.style.display = currentStep > 0 ? 'block' : 'none';
+        btnNext.textContent = currentStep === TOTAL_STEPS - 1 ? 'Submit request' : 'Continue';
+      }
+
+      function selectedText(sel) {
+        var opt = sel.options[sel.selectedIndex];
+        return opt ? opt.textContent : '';
+      }
+
+      function refreshLocationSummary() {
+        var c = selectedText(countrySelect);
+        var s = selectedText(stateSelect);
+        var city = selectedText(citySelect);
+        if (countrySelect.value && stateSelect.value && citySelect.value) {
+          locationSummary.innerHTML = '<i class="fas fa-map-marker-alt me-1"></i> <strong>' + escapeHtml(city) + '</strong>, ' + escapeHtml(s) + ', ' + escapeHtml(c);
+        } else {
+          locationSummary.textContent = '';
+        }
+      }
+
+      function escapeHtml(str) {
+        if (!str) return '';
+        var d = document.createElement('div');
+        d.textContent = str;
+        return d.innerHTML;
+      }
+
+      function loadCountries() {
+        return fetchList('/locations/countries?limit=500').then(function (list) {
+          countrySelect.innerHTML = '<option value="">Select country</option>';
+          list.forEach(function (c) {
+            var o = document.createElement('option');
+            o.value = c.id;
+            o.textContent = c.name;
+            countrySelect.appendChild(o);
+          });
+        }).catch(function () {
+          countrySelect.innerHTML = '<option value="">Unable to load countries</option>';
+        });
+      }
+
+      function loadStates(countryId) {
+        stateSelect.innerHTML = '<option value="">Loading…</option>';
+        stateSelect.disabled = true;
+        if (!countryId) {
+          stateSelect.innerHTML = '<option value="">Select country first</option>';
+          return Promise.resolve();
+        }
+        return fetchList('/locations/states?countryId=' + encodeURIComponent(countryId) + '&limit=500').then(function (list) {
+          stateSelect.innerHTML = '<option value="">Select state</option>';
+          list.forEach(function (s) {
+            var o = document.createElement('option');
+            o.value = s.id;
+            o.textContent = s.name;
+            stateSelect.appendChild(o);
+          });
+          stateSelect.disabled = list.length === 0;
+        }).catch(function () {
+          stateSelect.innerHTML = '<option value="">Unable to load states</option>';
+        });
+      }
+
+      function loadCities(stateId) {
+        citySelect.innerHTML = '<option value="">Loading…</option>';
+        citySelect.disabled = true;
+        if (!stateId) {
+          citySelect.innerHTML = '<option value="">Select state first</option>';
+          return Promise.resolve();
+        }
+        return fetchList('/locations/cities?stateId=' + encodeURIComponent(stateId) + '&limit=500').then(function (list) {
+          citySelect.innerHTML = '<option value="">Select city</option>';
+          list.forEach(function (c) {
+            var o = document.createElement('option');
+            o.value = c.id;
+            o.textContent = c.name;
+            citySelect.appendChild(o);
+          });
+          citySelect.disabled = list.length === 0;
+        }).catch(function () {
+          citySelect.innerHTML = '<option value="">Unable to load cities</option>';
+        });
+      }
+
+      function loadSocieties() {
+        var cid = countrySelect.value;
+        var sid = stateSelect.value;
+        var cityId = citySelect.value;
+        societySelect.innerHTML = '<option value="">Loading societies…</option>';
+        societySelect.disabled = true;
+        if (!cid || !sid || !cityId) return Promise.resolve();
+        var q = '?countryId=' + encodeURIComponent(cid) + '&stateId=' + encodeURIComponent(sid) + '&cityId=' + encodeURIComponent(cityId) + '&limit=500';
+        return fetch(url('/societies/list' + q)).then(function (r) { return r.json(); }).then(function (data) {
+          var list = listFromResponse(data);
+          societySelect.innerHTML = '<option value="">Select your society</option>';
+          list.forEach(function (s) {
+            var o = document.createElement('option');
+            o.value = s.id;
+            o.textContent = s.name + (s.alias ? ' (' + s.alias + ')' : '');
+            societySelect.appendChild(o);
+          });
+          societySelect.disabled = list.length === 0;
+          if (list.length === 0) {
+            societySelect.innerHTML = '<option value="">No societies in this area</option>';
+          }
+        }).catch(function () {
+          societySelect.innerHTML = '<option value="">Unable to load societies</option>';
+        });
+      }
 
       function loadTowers(societyId) {
         towerSelect.innerHTML = '<option value="">Select tower / block</option>';
         flatSelect.innerHTML = '<option value="">Select tower first</option>';
         flatSelect.disabled = true;
-        if (!societyId) { towerSelect.disabled = true; return; }
+        if (!societyId) {
+          towerSelect.disabled = true;
+          return;
+        }
         towerSelect.disabled = false;
-        fetch(url('/societies/' + societyId + '/towers'))
-          .then(function (r) { return r.json(); })
-          .then(function (data) {
-            if (data.success && data.data && data.data.length) {
-              data.data.forEach(function (t) {
-                var o = document.createElement('option');
-                o.value = t;
-                o.textContent = t;
-                towerSelect.appendChild(o);
-              });
-            }
-          })
-          .catch(function () { towerSelect.innerHTML = '<option value="">Unable to load</option>'; });
+        fetch(url('/societies/' + societyId + '/towers')).then(function (r) { return r.json(); }).then(function (data) {
+          var arr = listFromResponse(data);
+          towerSelect.innerHTML = '<option value="">Select tower / block</option>';
+          arr.forEach(function (t) {
+            var o = document.createElement('option');
+            o.value = t;
+            o.textContent = t;
+            towerSelect.appendChild(o);
+          });
+        }).catch(function () {
+          towerSelect.innerHTML = '<option value="">Unable to load</option>';
+        });
       }
 
       function loadFlats(societyId, tower) {
         flatSelect.innerHTML = '<option value="">Loading…</option>';
         flatSelect.disabled = true;
         var q = tower ? '?tower=' + encodeURIComponent(tower) : '';
-        fetch(url('/societies/' + societyId + '/flats' + q))
-          .then(function (r) { return r.json(); })
-          .then(function (data) {
-            signupFlats = data.success && data.data ? data.data : [];
-            flatSelect.innerHTML = '<option value="">Select flat</option>';
-            signupFlats.forEach(function (f) {
-              var o = document.createElement('option');
-              o.value = f.id;
-              o.textContent = f.tower + ' – ' + (f.flatNumber || f.flat_number || '');
-              o.dataset.tower = f.tower;
-              o.dataset.flatNumber = f.flatNumber || f.flat_number || '';
-              flatSelect.appendChild(o);
-            });
-            flatSelect.disabled = signupFlats.length === 0;
-          })
-          .catch(function () {
-            flatSelect.innerHTML = '<option value="">Unable to load</option>';
+        fetch(url('/societies/' + societyId + '/flats' + q)).then(function (r) { return r.json(); }).then(function (data) {
+          var signupFlats = listFromResponse(data);
+          flatSelect.innerHTML = '<option value="">Select flat</option>';
+          signupFlats.forEach(function (f) {
+            var o = document.createElement('option');
+            o.value = f.id;
+            o.textContent = f.tower + ' – ' + (f.flatNumber || f.flat_number || '');
+            o.dataset.tower = f.tower;
+            o.dataset.flatNumber = f.flatNumber || f.flat_number || '';
+            flatSelect.appendChild(o);
           });
+          flatSelect.disabled = signupFlats.length === 0;
+        }).catch(function () {
+          flatSelect.innerHTML = '<option value="">Unable to load</option>';
+        });
       }
+
+      countrySelect.addEventListener('change', function () {
+        stateSelect.innerHTML = '<option value="">Select country first</option>';
+        citySelect.innerHTML = '<option value="">Select state first</option>';
+        citySelect.disabled = true;
+        societySelect.innerHTML = '<option value="">Select city first</option>';
+        societySelect.disabled = true;
+        loadStates(countrySelect.value);
+      });
+
+      stateSelect.addEventListener('change', function () {
+        citySelect.innerHTML = '<option value="">Select state first</option>';
+        societySelect.innerHTML = '<option value="">Select city first</option>';
+        societySelect.disabled = true;
+        loadCities(stateSelect.value);
+      });
+
+      citySelect.addEventListener('change', function () {
+        refreshLocationSummary();
+      });
 
       societySelect.addEventListener('change', function () {
         var sid = societySelect.value ? parseInt(societySelect.value, 10) : null;
@@ -143,36 +401,72 @@
 
       towerSelect.addEventListener('change', function () {
         var sid = societySelect.value ? parseInt(societySelect.value, 10) : null;
-        var t = towerSelect.value || '';
-        if (!sid) return;
-        loadFlats(sid, t);
+        loadFlats(sid, towerSelect.value || '');
       });
 
-      fetch(url('/societies/list'))
-        .then(function (r) { return r.json(); })
-        .then(function (data) {
-          if (data.success && data.data && data.data.length) {
-            data.data.forEach(function (s) {
-              var o = document.createElement('option');
-              o.value = s.id;
-              o.textContent = s.name + (s.alias ? ' (' + s.alias + ')' : '');
-              societySelect.appendChild(o);
-            });
-          } else {
-            societySelect.innerHTML = '<option value="">No societies available</option>';
-          }
-        })
-        .catch(function () {
-          societySelect.innerHTML = '<option value="">Unable to load societies</option>';
-        });
-
-      document.getElementById('signupForm').addEventListener('submit', function (e) {
-        e.preventDefault();
+      function validateStep() {
         var err = document.getElementById('formError');
-        var btn = document.getElementById('submitBtn');
         err.classList.remove('show');
         err.textContent = '';
-        var societyId = parseInt(document.getElementById('societyId').value, 10);
+        if (currentStep === 0 && !countrySelect.value) {
+          err.textContent = 'Please select a country.';
+          err.classList.add('show');
+          return false;
+        }
+        if (currentStep === 1 && !stateSelect.value) {
+          err.textContent = 'Please select a state.';
+          err.classList.add('show');
+          return false;
+        }
+        if (currentStep === 2 && !citySelect.value) {
+          err.textContent = 'Please select a city.';
+          err.classList.add('show');
+          return false;
+        }
+        if (currentStep === 3 && !societySelect.value) {
+          err.textContent = 'Please select a society.';
+          err.classList.add('show');
+          return false;
+        }
+        if (currentStep === 4) {
+          var name = document.getElementById('name').value.trim();
+          var email = document.getElementById('email').value.trim();
+          var flatOpt = flatSelect.options[flatSelect.selectedIndex];
+          var tower = flatOpt && flatOpt.dataset ? flatOpt.dataset.tower : '';
+          var flatNumber = flatOpt && flatOpt.dataset ? flatOpt.dataset.flatNumber : '';
+          var password = document.getElementById('password').value;
+          if (!name || !email || !tower || !flatNumber || !password || password.length < 6) {
+            err.textContent = 'Please fill all required fields. Password min 6 characters.';
+            err.classList.add('show');
+            return false;
+          }
+        }
+        return true;
+      }
+
+      btnNext.addEventListener('click', function () {
+        if (!validateStep()) return;
+        if (currentStep < TOTAL_STEPS - 1) {
+          var next = currentStep + 1;
+          if (currentStep === 2) {
+            refreshLocationSummary();
+            loadSocieties().then(function () { goToStep(next); });
+            return;
+          }
+          goToStep(next);
+          if (currentStep === 4 && societySelect.value) {
+            loadTowers(parseInt(societySelect.value, 10));
+            var t = towerSelect.value;
+            if (t) loadFlats(parseInt(societySelect.value, 10), t);
+          }
+          return;
+        }
+
+        var err = document.getElementById('formError');
+        var societyId = parseInt(societySelect.value, 10);
+        var countryId = parseInt(countrySelect.value, 10);
+        var stateId = parseInt(stateSelect.value, 10);
+        var cityId = parseInt(citySelect.value, 10);
         var name = document.getElementById('name').value.trim();
         var email = document.getElementById('email').value.trim();
         var phone = document.getElementById('phone').value.trim();
@@ -180,18 +474,17 @@
         var tower = flatOpt && flatOpt.dataset ? flatOpt.dataset.tower : '';
         var flatNumber = flatOpt && flatOpt.dataset ? flatOpt.dataset.flatNumber : '';
         var password = document.getElementById('password').value;
-        if (!societyId || !name || !email || !tower || !flatNumber || !password || password.length < 6) {
-          err.textContent = 'Please fill all required fields including Society, Tower and Flat. Password min 6 characters.';
-          err.classList.add('show');
-          return;
-        }
-        btn.disabled = true;
-        btn.textContent = 'Submitting…';
+
+        btnNext.disabled = true;
+        btnNext.textContent = 'Submitting…';
         fetch(url('/signup-requests'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             societyId: societyId,
+            countryId: countryId,
+            stateId: stateId,
+            cityId: cityId,
             name: name,
             email: email,
             phone: phone || undefined,
@@ -211,17 +504,25 @@
             } else {
               err.textContent = (result.data && result.data.message) || 'Request failed. Try again.';
               err.classList.add('show');
-              btn.disabled = false;
-              btn.textContent = 'Submit request';
+              btnNext.disabled = false;
+              btnNext.textContent = 'Submit request';
             }
           })
           .catch(function () {
             err.textContent = 'Network error. Please try again.';
             err.classList.add('show');
-            btn.disabled = false;
-            btn.textContent = 'Submit request';
+            btnNext.disabled = false;
+            btnNext.textContent = 'Submit request';
           });
       });
+
+      btnBack.addEventListener('click', function () {
+        document.getElementById('formError').classList.remove('show');
+        if (currentStep > 0) goToStep(currentStep - 1);
+      });
+
+      goToStep(0);
+      loadCountries();
     })();
   </script>
 </body>

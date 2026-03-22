@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2563EB">
+  <base href="/mobile/">
+  <title>My maintenance & dues | SocietyHub</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link href="mobile.css" rel="stylesheet">
+</head>
+<body>
+  <script src="api.js"></script>
+  <script src="auth-gate.js"></script>
+  <div class="app-shell">
+    <header class="app-bar">
+      <a href="more.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+      <h1 class="title">My dues</h1>
+    </header>
+    <main class="app-content no-tabs">
+      <p class="page-sub" style="margin-bottom:16px;">Maintenance and charges linked to your flat (member view only).</p>
+      <div id="billLoading" class="empty-state" style="padding:24px; display:none;"><p class="es-text">Loading…</p></div>
+      <div id="billEmpty" class="empty-state" style="padding:24px; display:none;"><p class="es-text">No billing records for your flat yet.</p></div>
+      <div id="billList"></div>
+    </main>
+  </div>
+  <script>
+    (function () {
+      var loading = document.getElementById('billLoading');
+      var empty = document.getElementById('billEmpty');
+      var list = document.getElementById('billList');
+      loading.style.display = 'block';
+      window.MobileAPI.apiGet('/billing?limit=50').then(function (r) {
+        loading.style.display = 'none';
+        var rows = window.MobileAPI.listFrom(r);
+        if (!rows.length) { empty.style.display = 'block'; return; }
+        rows.forEach(function (b) {
+          var card = document.createElement('div');
+          card.className = 'info-card';
+          var st = (b.paymentStatus || '').replace(/_/g, ' ');
+          var due = b.dueDate ? new Date(b.dueDate).toLocaleDateString('en-IN') : '—';
+          var amt = typeof b.amount === 'number' ? b.amount.toFixed(2) : b.amount;
+          card.innerHTML = '<div class="ic-header"><h3 class="ic-title">' + String(b.type || 'Charge').replace(/</g, '&lt;') + '</h3><span class="ic-badge ' + (b.paymentStatus === 'paid' ? 'resolved' : 'at-gate') + '">' + st + '</span></div><div class="ic-meta">₹ ' + amt + ' · Due ' + due + '</div>' + (b.invoiceNumber ? '<div class="ic-detail">Invoice ' + String(b.invoiceNumber).replace(/</g, '&lt;') + '</div>' : '');
+          list.appendChild(card);
+        });
+      }).catch(function () {
+        loading.style.display = 'none';
+        empty.style.display = 'block';
+        empty.querySelector('.es-text').textContent = 'Unable to load billing.';
+      });
+    })();
+  </script>
+</body>
+</html>

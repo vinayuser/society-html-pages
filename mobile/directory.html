@@ -10,62 +10,101 @@
   <link href="mobile.css" rel="stylesheet">
 </head>
 <body>
+  <script src="api.js"></script>
+  <script src="auth-gate.js"></script>
   <div class="app-shell">
     <header class="app-bar">
       <a href="more.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
       <h1 class="title">Directory</h1>
     </header>
     <main class="app-content no-tabs">
-      <p class="page-sub" style="margin-bottom:20px;">Quick access to security, society office and emergency numbers.</p>
-      <div class="list-section-title">Security & gate</div>
-      <div class="dir-card">
-        <div class="dir-icon"><i class="fas fa-shield-alt"></i></div>
-        <div class="dir-info">
-          <div class="dir-name">Main gate security</div>
-          <div class="dir-role">24/7 · Visitor entry, deliveries</div>
-          <div class="dir-phone">+91 98765 40001</div>
+      <p class="page-sub" style="margin-bottom:20px;">Society office and contacts shared with all members.</p>
+      <div id="dirLoading" class="empty-state" style="padding:24px;"><p class="es-text">Loading…</p></div>
+      <div id="dirContent" style="display:none;">
+        <div class="list-section-title">Society</div>
+        <div class="dir-card">
+          <div class="dir-icon"><i class="fas fa-building"></i></div>
+          <div class="dir-info">
+            <div class="dir-name" id="socName"></div>
+            <div class="dir-role">Registered society contact</div>
+            <div class="dir-phone" id="socPhone"></div>
+          </div>
+          <a href="#" class="dir-call" id="socTel" style="display:none;"><i class="fas fa-phone"></i></a>
         </div>
-        <a href="tel:+919876540001" class="dir-call"><i class="fas fa-phone"></i></a>
-      </div>
-      <div class="dir-card">
-        <div class="dir-icon"><i class="fas fa-user-shield"></i></div>
-        <div class="dir-info">
-          <div class="dir-name">Security in-charge</div>
-          <div class="dir-role">Mr. Suresh · Emergency coordination</div>
-          <div class="dir-phone">+91 98765 40002</div>
+        <div class="list-section-title">Management office</div>
+        <div class="dir-card" id="officeCard" style="display:none;">
+          <div class="dir-icon"><i class="fas fa-user-tie"></i></div>
+          <div class="dir-info">
+            <div class="dir-name" id="offName"></div>
+            <div class="dir-role" id="offAddr"></div>
+            <div class="dir-phone" id="offPhone"></div>
+          </div>
+          <a href="#" class="dir-call" id="offTel" style="display:none;"><i class="fas fa-phone"></i></a>
         </div>
-        <a href="tel:+919876540002" class="dir-call"><i class="fas fa-phone"></i></a>
-      </div>
-      <div class="list-section-title">Society office</div>
-      <div class="dir-card">
-        <div class="dir-icon"><i class="fas fa-building"></i></div>
-        <div class="dir-info">
-          <div class="dir-name">Management office</div>
-          <div class="dir-role">Mon–Sat 9 AM – 6 PM · Complaints, billing</div>
-          <div class="dir-phone">+91 98765 50001</div>
+        <div class="list-section-title">Emergency (India)</div>
+        <div class="dir-card">
+          <div class="dir-icon" style="background:#fef2f2; color:#dc2626;"><i class="fas fa-ambulance"></i></div>
+          <div class="dir-info">
+            <div class="dir-name">Ambulance</div>
+            <div class="dir-role">National</div>
+            <div class="dir-phone">102</div>
+          </div>
+          <a href="tel:102" class="dir-call"><i class="fas fa-phone"></i></a>
         </div>
-        <a href="tel:+919876550001" class="dir-call"><i class="fas fa-phone"></i></a>
-      </div>
-      <div class="list-section-title">Emergency</div>
-      <div class="dir-card">
-        <div class="dir-icon" style="background:#fef2f2; color:#dc2626;"><i class="fas fa-ambulance"></i></div>
-        <div class="dir-info">
-          <div class="dir-name">Ambulance</div>
-          <div class="dir-role">National emergency</div>
-          <div class="dir-phone">102</div>
+        <div class="dir-card">
+          <div class="dir-icon" style="background:#fef2f2; color:#dc2626;"><i class="fas fa-fire-extinguisher"></i></div>
+          <div class="dir-info">
+            <div class="dir-name">Fire</div>
+            <div class="dir-role">Emergency</div>
+            <div class="dir-phone">101</div>
+          </div>
+          <a href="tel:101" class="dir-call"><i class="fas fa-phone"></i></a>
         </div>
-        <a href="tel:102" class="dir-call"><i class="fas fa-phone"></i></a>
-      </div>
-      <div class="dir-card">
-        <div class="dir-icon" style="background:#fef2f2; color:#dc2626;"><i class="fas fa-fire-extinguisher"></i></div>
-        <div class="dir-info">
-          <div class="dir-name">Fire / Police</div>
-          <div class="dir-role">Emergency</div>
-          <div class="dir-phone">101 / 100</div>
+        <div class="dir-card">
+          <div class="dir-icon" style="background:#fef2f2; color:#dc2626;"><i class="fas fa-shield-alt"></i></div>
+          <div class="dir-info">
+            <div class="dir-name">Police</div>
+            <div class="dir-role">Emergency</div>
+            <div class="dir-phone">100</div>
+          </div>
+          <a href="tel:100" class="dir-call"><i class="fas fa-phone"></i></a>
         </div>
-        <a href="tel:101" class="dir-call"><i class="fas fa-phone"></i></a>
       </div>
+      <div id="dirError" class="empty-state" style="padding:24px; display:none;"><p class="es-text">Unable to load directory.</p></div>
     </main>
   </div>
+  <script>
+    (function () {
+      window.MobileAPI.apiGet('/app/directory').then(function (r) {
+        var d = window.MobileAPI.dataFrom(r);
+        document.getElementById('dirLoading').style.display = 'none';
+        if (!d) { document.getElementById('dirError').style.display = 'block'; return; }
+        document.getElementById('dirContent').style.display = 'block';
+        document.getElementById('socName').textContent = d.societyName || 'Your society';
+        document.getElementById('socPhone').textContent = d.societyPhone || d.societyEmail || '—';
+        if (d.societyPhone) {
+          var tel = 'tel:' + String(d.societyPhone).replace(/\s/g, '');
+          var st = document.getElementById('socTel');
+          st.href = tel;
+          st.style.display = '';
+        }
+        if (d.officeContactName || d.officeContactPhone || d.officeAddress) {
+          document.getElementById('officeCard').style.display = '';
+          document.getElementById('offName').textContent = d.officeContactName || 'Office';
+          document.getElementById('offAddr').textContent = d.officeAddress || 'Contact management for hours';
+          document.getElementById('offPhone').textContent = d.officeContactPhone || d.societyPhone || '—';
+          if (d.officeContactPhone || d.societyPhone) {
+            var p = d.officeContactPhone || d.societyPhone;
+            var ot = document.getElementById('offTel');
+            ot.href = 'tel:' + String(p).replace(/\s/g, '');
+            ot.style.display = '';
+          }
+        }
+      }).catch(function () {
+        document.getElementById('dirLoading').style.display = 'none';
+        document.getElementById('dirError').style.display = 'block';
+      });
+    })();
+  </script>
 </body>
 </html>

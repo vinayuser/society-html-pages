@@ -62,8 +62,20 @@
       var form = document.getElementById('inviteForm');
       var noFlats = document.getElementById('noFlats');
       var flatSelect = document.getElementById('flatId');
+      var qs = new URLSearchParams(window.location.search);
+      var preset = qs.get('type');
+      if (preset === 'delivery') {
+        document.getElementById('visitorType').value = 'delivery';
+        document.getElementById('purpose').value = 'Delivery';
+      } else if (preset === 'vendor') {
+        document.getElementById('visitorType').value = 'vendor';
+        document.getElementById('purpose').value = 'Service / repair';
+      } else if (preset === 'guest') {
+        document.getElementById('visitorType').value = 'guest';
+        document.getElementById('purpose').value = 'Guest';
+      }
       window.MobileAPI.apiGet('/app/my-flats').then(function(r){
-        var flats = r.data || [];
+        var flats = window.MobileAPI.listFrom(r);
         if (!flats.length) { noFlats.style.display = 'block'; return; }
         form.style.display = 'block';
         flats.forEach(function(f){ var o = document.createElement('option'); o.value = f.id; o.textContent = (f.tower || '') + '-' + (f.flatNumber || ''); flatSelect.appendChild(o); });

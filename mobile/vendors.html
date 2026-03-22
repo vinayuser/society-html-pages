@@ -5,83 +5,55 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#7c3aed">
   <base href="/mobile/">
-  <title>Services | SocietyHub</title>
+  <title>Approved services | SocietyHub</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
   <link href="mobile.css" rel="stylesheet">
   <style>
-    .services-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
-    .service-card { background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; text-decoration: none; color: var(--text); box-shadow: var(--shadow-sm); }
-    .service-card:active { background: var(--bg-body); }
-    .service-card .sc-img { height: 90px; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; }
-    .service-card .sc-img.plumb { background: #dbeafe; color: #1d4ed8; }
-    .service-card .sc-img.elec { background: #fef3c7; color: #b45309; }
-    .service-card .sc-img.clean { background: #d1fae5; color: #059669; }
-    .service-card .sc-img.ac { background: #e0e7ff; color: #4f46e5; }
-    .service-card .sc-img.paint { background: #fce7f3; color: #be185d; }
-    .service-card .sc-img.carp { background: #ede9fe; color: var(--primary); }
-    .service-card .sc-img.beauty { background: #fef3c7; color: #b45309; }
-    .service-card .sc-label { padding: 14px; font-weight: 700; font-size: 0.95rem; text-align: center; }
-    .booking-card { background: var(--bg-card); border-radius: var(--radius); padding: 16px; margin-bottom: 20px; border: 1px solid var(--border); }
-    .booking-card .bc-title { font-weight: 700; margin-bottom: 4px; }
-    .booking-card .bc-meta { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px; }
-    .booking-card .bc-date { font-size: 0.8rem; color: var(--text-secondary); }
+    .vendor-row { display:flex; align-items:flex-start; gap:12px; padding:16px; background:var(--bg-card); border-radius:var(--radius); margin-bottom:10px; border:1px solid var(--border); }
+    .vendor-row .vr-body { flex:1; min-width:0; }
+    .vendor-row .vr-name { font-weight:700; }
+    .vendor-row .vr-meta { font-size:0.85rem; color:var(--text-muted); margin-top:4px; }
+    .vendor-row a.tel { color:var(--primary); font-weight:600; text-decoration:none; white-space:nowrap; }
   </style>
 </head>
 <body>
+  <script src="api.js"></script>
+  <script src="auth-gate.js"></script>
   <div class="app-shell">
     <header class="app-bar">
       <a href="more.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
       <h1 class="title">Services</h1>
-      <button type="button" class="icon-btn"><i class="fas fa-search"></i></button>
     </header>
     <main class="app-content no-tabs">
-      <div class="section-block">
-        <h2 class="sb-title">Your Bookings</h2>
-        <p class="sb-subtitle">Upcoming and past service requests</p>
-        <div class="booking-card">
-          <div class="bc-title">Appliances Repair</div>
-          <div class="bc-meta">AC stopped working. Need service.</div>
-          <div class="bc-date">22 Aug | 03:30 PM</div>
-        </div>
-      </div>
-      <div class="section-block">
-        <h2 class="sb-title">Nearby Service Providers</h2>
-        <p class="sb-subtitle">Book approved vendors for your home</p>
-        <div class="services-grid">
-          <a href="#" class="service-card">
-            <div class="sc-img carp"><i class="fas fa-hammer"></i></div>
-            <div class="sc-label">Carpenter Service</div>
-          </a>
-          <a href="#" class="service-card">
-            <div class="sc-img clean"><i class="fas fa-broom"></i></div>
-            <div class="sc-label">Home cleaning</div>
-          </a>
-          <a href="#" class="service-card">
-            <div class="sc-img ac"><i class="fas fa-tools"></i></div>
-            <div class="sc-label">Appliances repair</div>
-          </a>
-          <a href="#" class="service-card">
-            <div class="sc-img plumb"><i class="fas fa-faucet"></i></div>
-            <div class="sc-label">Plumbing service</div>
-          </a>
-          <a href="#" class="service-card">
-            <div class="sc-img paint"><i class="fas fa-paint-roller"></i></div>
-            <div class="sc-label">Home Painting</div>
-          </a>
-          <a href="#" class="service-card">
-            <div class="sc-img elec"><i class="fas fa-bolt"></i></div>
-            <div class="sc-label">Electrician</div>
-          </a>
-          <a href="#" class="service-card">
-            <div class="sc-img beauty"><i class="fas fa-spa"></i></div>
-            <div class="sc-label">Beauty</div>
-          </a>
-        </div>
-      </div>
-      <div style="padding:16px; background:var(--border); border-radius:var(--radius-sm); margin-top:16px;">
-        <input type="search" placeholder="Search services..." style="width:100%; padding:12px 16px; border:none; border-radius:8px; font-size:1rem;" aria-label="Search">
-      </div>
+      <p class="page-sub" style="margin-bottom:16px;">Vendors approved by your society for members.</p>
+      <div id="vLoading" class="empty-state" style="padding:24px; display:none;"><p class="es-text">Loading…</p></div>
+      <div id="vEmpty" class="empty-state" style="padding:24px; display:none;"><p class="es-text">No vendors listed yet. Ask your society office.</p></div>
+      <div id="vList"></div>
     </main>
   </div>
+  <script>
+    (function () {
+      var loading = document.getElementById('vLoading');
+      var empty = document.getElementById('vEmpty');
+      var list = document.getElementById('vList');
+      loading.style.display = 'block';
+      window.MobileAPI.apiGet('/vendors?limit=100').then(function (r) {
+        loading.style.display = 'none';
+        var rows = window.MobileAPI.listFrom(r);
+        if (!rows.length) { empty.style.display = 'block'; return; }
+        rows.forEach(function (v) {
+          var div = document.createElement('div');
+          div.className = 'vendor-row';
+          var phone = v.phone ? '<a class="tel" href="tel:' + String(v.phone).replace(/\s/g, '') + '"><i class="fas fa-phone"></i></a>' : '';
+          div.innerHTML = '<div class="vr-body"><div class="vr-name">' + String(v.vendorName || '').replace(/</g, '&lt;') + '</div><div class="vr-meta">' + String(v.category || 'Service').replace(/</g, '&lt;') + (v.description ? ' · ' + String(v.description).substring(0, 80).replace(/</g, '&lt;') : '') + '</div></div>' + phone;
+          list.appendChild(div);
+        });
+      }).catch(function () {
+        loading.style.display = 'none';
+        empty.style.display = 'block';
+        empty.querySelector('.es-text').textContent = 'Unable to load vendors. Member access only.';
+      });
+    })();
+  </script>
 </body>
 </html>

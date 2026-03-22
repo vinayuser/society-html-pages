@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#7c3aed">
+  <base href="/mobile/">
+  <title>Notifications | SocietyHub</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link href="mobile.css" rel="stylesheet">
+</head>
+<body>
+  <script src="api.js"></script>
+  <script src="auth-gate.js"></script>
+  <div class="app-shell">
+    <header class="app-bar">
+      <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+      <h1 class="title">Notifications</h1>
+    </header>
+    <main class="app-content no-tabs">
+      <p class="page-sub" style="margin-bottom:12px;">Updates for your member account.</p>
+      <button type="button" class="btn-add" id="markAll" style="margin-bottom:16px; border:none; cursor:pointer;">Mark all read</button>
+      <div id="nLoading" class="empty-state" style="padding:24px; display:none;"><p class="es-text">Loading…</p></div>
+      <div id="nEmpty" class="empty-state" style="padding:24px; display:none;"><p class="es-text">No notifications.</p></div>
+      <div id="nList"></div>
+    </main>
+  </div>
+  <script>
+    (function () {
+      function load() {
+        var loading = document.getElementById('nLoading');
+        var empty = document.getElementById('nEmpty');
+        var list = document.getElementById('nList');
+        list.innerHTML = '';
+        loading.style.display = 'block';
+        empty.style.display = 'none';
+        window.MobileAPI.apiGet('/notifications?limit=50').then(function (r) {
+          loading.style.display = 'none';
+          var rows = window.MobileAPI.listFrom(r);
+          if (!rows.length) { empty.style.display = 'block'; return; }
+          rows.forEach(function (n) {
+            var card = document.createElement('div');
+            card.className = 'info-card' + (n.readAt ? '' : ' accent-primary');
+            var t = n.createdAt ? new Date(n.createdAt).toLocaleString('en-IN', { dateStyle: 'short', timeStyle: 'short' }) : '';
+            card.innerHTML = '<div class="ic-header"><h3 class="ic-title" style="font-size:1rem;">' + String(n.title || 'Notice').replace(/</g, '&lt;') + '</h3></div><div class="ic-detail">' + String(n.body || '').replace(/</g, '&lt;') + '</div><div class="ic-footer"><span class="ic-time">' + t + '</span></div>';
+            if (!n.readAt) {
+              card.style.cursor = 'pointer';
+              card.addEventListener('click', function () {
+                window.MobileAPI.apiPatch('/notifications/' + n.id + '/read', {}).then(function () { load(); }).catch(function () {});
+              });
+            }
+            list.appendChild(card);
+          });
+        }).catch(function () {
+          loading.style.display = 'none';
+          empty.style.display = 'block';
+          empty.querySelector('.es-text').textContent = 'Unable to load notifications.';
+        });
+      }
+      document.getElementById('markAll').addEventListener('click', function () {
+        window.MobileAPI.apiPost('/notifications/mark-all-read', {}).then(function () { load(); }).catch(function () {});
+      });
+      load();
+    })();
+  </script>
+</body>
+</html>

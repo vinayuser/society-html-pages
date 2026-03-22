@@ -16,50 +16,13 @@
     <header class="app-bar">
       <a href="index.html" class="logo">SH</a>
       <h1 class="title">Activity</h1>
-      <div class="notif-wrap">
-        <button type="button" class="icon-btn"><i class="fas fa-bell"></i></button>
-        <span class="notif-badge">2</span>
-      </div>
-      <a href="profile.html" class="avatar">R</a>
+      <a href="profile.html" class="avatar" id="headerAvatar">R</a>
     </header>
     <main class="app-content">
-      <div class="segments">
-        <a href="#" class="active">Today</a>
-        <a href="#">Upcoming</a>
-      </div>
-      <ul class="card-list" style="list-style:none; padding:0; margin:0;">
-        <li style="display:flex; align-items:flex-start; gap:14px; padding:16px; background:var(--bg-card); border-radius:var(--radius); margin-bottom:10px; border:1px solid var(--border);">
-          <div style="width:48px; height:48px; border-radius:50%; background:var(--primary-light); color:var(--primary); display:flex; align-items:center; justify-content:center; font-size:1.2rem; flex-shrink:0;"><i class="fas fa-user"></i></div>
-          <div style="flex:1; min-width:0;">
-            <div style="font-weight:700; margin-bottom:4px;">Guest | John Doe</div>
-            <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:6px;">10:45 AM · GatePass #2847</div>
-            <span style="display:inline-block; font-size:0.7rem; font-weight:700; padding:4px 10px; border-radius:12px; background:var(--success-bg); color:var(--success);">PRE APPROVED</span>
-            <div style="margin-top:12px; display:flex; gap:10px;">
-              <a href="tel:+919876543210" style="display:inline-flex; align-items:center; gap:6px; padding:8px 14px; background:var(--primary); color:#fff; border-radius:var(--radius-sm); font-size:0.85rem; font-weight:600; text-decoration:none;"><i class="fas fa-phone"></i> Call</a>
-              <button type="button" style="display:inline-flex; align-items:center; gap:6px; padding:8px 14px; background:var(--bg-body); color:var(--text-muted); border:1px solid var(--border); border-radius:var(--radius-sm); font-size:0.85rem;"><i class="fas fa-trash-alt"></i> Delete</button>
-            </div>
-          </div>
-        </li>
-        <li style="display:flex; align-items:flex-start; gap:14px; padding:16px; background:var(--bg-card); border-radius:var(--radius); margin-bottom:10px; border:1px solid var(--border);">
-          <div style="width:48px; height:48px; border-radius:50%; background:#ede9fe; color:var(--primary); display:flex; align-items:center; justify-content:center; font-size:1.2rem; flex-shrink:0;"><i class="fas fa-user-cog"></i></div>
-          <div style="flex:1; min-width:0;">
-            <div style="font-weight:700; margin-bottom:4px;">Maid | Priya S.</div>
-            <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:6px;">9:00 AM · GatePass #2846</div>
-            <span style="display:inline-block; font-size:0.7rem; font-weight:700; padding:4px 10px; border-radius:12px; background:#ede9fe; color:var(--primary);">INSIDE</span>
-            <div style="margin-top:12px;">
-              <a href="tel:+919876543211" style="display:inline-flex; align-items:center; gap:6px; padding:8px 14px; background:var(--primary); color:#fff; border-radius:var(--radius-sm); font-size:0.85rem; font-weight:600; text-decoration:none;"><i class="fas fa-phone"></i> Call</a>
-            </div>
-          </div>
-        </li>
-        <li style="display:flex; align-items:flex-start; gap:14px; padding:16px; background:var(--bg-card); border-radius:var(--radius); margin-bottom:10px; border:1px solid var(--border);">
-          <div style="width:48px; height:48px; border-radius:50%; background:#dbeafe; color:#1d4ed8; display:flex; align-items:center; justify-content:center; font-size:1.2rem; flex-shrink:0;"><i class="fas fa-box"></i></div>
-          <div style="flex:1; min-width:0;">
-            <div style="font-weight:700; margin-bottom:4px;">Delivery | Amazon</div>
-            <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:6px;">10:35 AM · At gate · OTP 4829</div>
-            <span style="display:inline-block; font-size:0.7rem; font-weight:700; padding:4px 10px; border-radius:12px; background:var(--warning-bg); color:var(--warning);">AT GATE</span>
-          </div>
-        </li>
-      </ul>
+      <p class="page-sub" style="margin-bottom:16px;">Recent visitors and deliveries for <strong>your flat</strong> only.</p>
+      <div id="actLoading" class="empty-state" style="padding:24px; display:none;"><p class="es-text">Loading…</p></div>
+      <div id="actEmpty" class="empty-state" style="padding:24px; display:none;"><p class="es-text">Nothing recent. Pre-approve a visitor from Home.</p></div>
+      <ul class="card-list" id="actList" style="list-style:none; padding:0; margin:0;"></ul>
     </main>
     <nav class="tab-bar">
       <a href="index.html"><i class="fas fa-home"></i><span>Home</span></a>
@@ -68,5 +31,37 @@
       <a href="more.html"><i class="fas fa-ellipsis-h"></i><span>More</span></a>
     </nav>
   </div>
+  <script>
+    (function () {
+      var u = window.MobileAPI.getUser();
+      if (u && u.name) {
+        var a = document.getElementById('headerAvatar');
+        if (a) a.textContent = (u.name.trim().charAt(0) || 'R').toUpperCase();
+      }
+      var loading = document.getElementById('actLoading');
+      var empty = document.getElementById('actEmpty');
+      var list = document.getElementById('actList');
+      loading.style.display = 'block';
+      window.MobileAPI.apiGet('/app/activity').then(function (r) {
+        loading.style.display = 'none';
+        var payload = window.MobileAPI.dataFrom(r);
+        var items = (payload && payload.items) ? payload.items : [];
+        if (!items.length) { empty.style.display = 'block'; return; }
+        items.forEach(function (it) {
+          var li = document.createElement('li');
+          li.style.cssText = 'display:flex; align-items:flex-start; gap:14px; padding:16px; background:var(--bg-card); border-radius:var(--radius); margin-bottom:10px; border:1px solid var(--border);';
+          var icon = it.kind === 'delivery' ? 'fa-box' : 'fa-user';
+          var timeStr = it.atTime ? new Date(it.atTime).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }) : '';
+          var phoneBtn = it.phone ? '<a href="tel:' + String(it.phone).replace(/\s/g, '') + '" style="display:inline-flex; margin-top:10px; padding:8px 14px; background:var(--primary); color:#fff; border-radius:var(--radius-sm); font-size:0.85rem; font-weight:600; text-decoration:none;"><i class="fas fa-phone"></i> Call</a>' : '';
+          li.innerHTML = '<div style="width:48px; height:48px; border-radius:50%; background:var(--primary-light); color:var(--primary); display:flex; align-items:center; justify-content:center; font-size:1.2rem; flex-shrink:0;"><i class="fas ' + icon + '"></i></div><div style="flex:1; min-width:0;"><div style="font-weight:700;">' + String(it.title || '').replace(/</g, '&lt;') + '</div><div style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">' + String(it.subtitle || '').replace(/</g, '&lt;') + '</div><div style="font-size:0.75rem; color:var(--text-secondary); margin-top:4px;">' + timeStr + ' · ' + String(it.detail || '').replace(/</g, '&lt;') + '</div>' + phoneBtn + '</div>';
+          list.appendChild(li);
+        });
+      }).catch(function () {
+        loading.style.display = 'none';
+        empty.style.display = 'block';
+        empty.querySelector('.es-text').textContent = 'Unable to load activity.';
+      });
+    })();
+  </script>
 </body>
 </html>

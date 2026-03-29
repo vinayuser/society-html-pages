@@ -14,6 +14,7 @@
   }
   if (typeof window.API_BASE === 'undefined' || window.API_BASE === null || window.API_BASE === '') {
     window.API_BASE = 'http://13.203.227.4:5000';
+    // window.API_BASE = 'http://localhost:3000';
   }
 
   function getToken() {

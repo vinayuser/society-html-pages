@@ -18,25 +18,21 @@
 
     .auth-card { border-radius: var(--radius); background: var(--bg-card); box-shadow: var(--shadow); border: 1px solid var(--border); padding: 1.5rem 1.5rem 1.25rem; overflow: hidden; }
 
-    /* Step indicator */
     .step-dots { display: flex; justify-content: center; gap: 0.35rem; margin-bottom: 1rem; flex-wrap: wrap; }
-    .step-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border); transition: background 0.35s ease, transform 0.35s ease; }
+    .step-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); transition: background 0.35s ease, transform 0.35s ease; }
     .step-dot.active { background: var(--primary); transform: scale(1.15); }
     .step-dot.done { background: var(--primary); opacity: 0.45; }
     .step-label { text-align: center; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 1rem; min-height: 1.25rem; transition: color 0.3s ease, opacity 0.3s ease; }
     .step-label strong { color: var(--primary); font-weight: 700; }
 
-    /* Wizard slides */
     .wizard-viewport { overflow: hidden; width: 100%; position: relative; }
     .wizard-track {
       display: flex;
-      width: 500%;
       transition: transform 0.5s cubic-bezier(0.25, 0.85, 0.35, 1);
       will-change: transform;
     }
     .wizard-slide {
-      flex: 0 0 20%;
-      width: 20%;
+      flex-shrink: 0;
       padding-right: 0.75rem;
       box-sizing: border-box;
       opacity: 0.35;
@@ -63,6 +59,8 @@
     .form-card.hide { display: none; }
 
     .location-summary { font-size: 0.85rem; color: var(--text-muted); background: rgba(47, 128, 237, 0.06); border-radius: 8px; padding: 0.65rem 0.85rem; margin-bottom: 1rem; border: 1px solid var(--border); }
+    .otp-hint { font-size: 0.85rem; color: var(--text-muted); }
+    input[readonly].form-control { background: var(--bg-body, #f8f9fa); }
   </style>
 </head>
 <body>
@@ -71,7 +69,7 @@
       <a href="login.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to sign in</a>
       <div class="logo-wrap"><i class="fas fa-building"></i></div>
       <h1>Create account</h1>
-      <p class="sub">Request to join your society. Admin will approve before you can sign in.</p>
+      <p class="sub">Verify your email or phone, then find your society. Admin approves before you can sign in.</p>
 
       <div class="auth-card" id="formCard">
         <div class="step-dots" id="stepDots" aria-hidden="true"></div>
@@ -79,43 +77,54 @@
 
         <div class="wizard-viewport">
           <div class="wizard-track" id="wizardTrack">
-            <!-- Step 0: Country -->
+            <!-- 0: Contact -->
             <div class="wizard-slide is-current" data-step="0">
+              <label for="contact" class="form-label">Email or mobile number *</label>
+              <input type="text" id="contact" class="form-control form-control-lg mb-2" placeholder="you@example.com or +91 9876543210" autocomplete="username">
+              <p class="small text-muted mb-0">We’ll send a one-time code. Demo code: <strong>000000</strong></p>
+            </div>
+            <!-- 1: OTP -->
+            <div class="wizard-slide" data-step="1">
+              <label for="otp" class="form-label">Enter 6-digit OTP *</label>
+              <input type="text" id="otp" class="form-control form-control-lg mb-2" placeholder="000000" inputmode="numeric" maxlength="6" autocomplete="one-time-code">
+              <p class="otp-hint mb-0" id="otpMasked"></p>
+            </div>
+            <!-- 2: Country -->
+            <div class="wizard-slide" data-step="2">
               <label for="countryId" class="form-label">Country *</label>
               <select id="countryId" class="form-select form-select-lg mb-2">
                 <option value="">Loading countries…</option>
               </select>
-              <p class="small text-muted mb-0">Select your country to find societies in your area.</p>
             </div>
-            <!-- Step 1: State -->
-            <div class="wizard-slide" data-step="1">
+            <!-- 3: State -->
+            <div class="wizard-slide" data-step="3">
               <label for="stateId" class="form-label">State / Province *</label>
               <select id="stateId" class="form-select form-select-lg mb-2" disabled>
                 <option value="">Select country first</option>
               </select>
             </div>
-            <!-- Step 2: City -->
-            <div class="wizard-slide" data-step="2">
+            <!-- 4: City -->
+            <div class="wizard-slide" data-step="4">
               <label for="cityId" class="form-label">City *</label>
               <select id="cityId" class="form-select form-select-lg mb-2" disabled>
                 <option value="">Select state first</option>
               </select>
             </div>
-            <!-- Step 3: Society -->
-            <div class="wizard-slide" data-step="3">
+            <!-- 5: Society -->
+            <div class="wizard-slide" data-step="5">
               <div class="location-summary" id="locationSummary"></div>
               <label for="societyId" class="form-label">Society *</label>
               <select id="societyId" class="form-select form-select-lg mb-2" disabled>
                 <option value="">Select city first</option>
               </select>
             </div>
-            <!-- Step 4: Details + flat + password -->
-            <div class="wizard-slide" data-step="4">
+            <!-- 6: Details -->
+            <div class="wizard-slide" data-step="6">
               <label for="name" class="form-label">Full name *</label>
               <input type="text" id="name" class="form-control mb-2" placeholder="Your name" autocomplete="name">
               <label for="email" class="form-label">Email *</label>
               <input type="email" id="email" class="form-control mb-2" placeholder="you@example.com" autocomplete="email">
-              <label for="phone" class="form-label">Phone (optional)</label>
+              <label for="phone" class="form-label">Phone</label>
               <input type="tel" id="phone" class="form-control mb-2" placeholder="+91 98765 43210" autocomplete="tel">
               <label for="tower" class="form-label">Tower / Block *</label>
               <select id="tower" class="form-select mb-2" disabled>
@@ -165,14 +174,30 @@
         return fetch(url(apiPath)).then(function (r) { return r.json(); }).then(listFromResponse);
       }
 
-      var TOTAL_STEPS = 5;
+      var TOTAL_STEPS = 7;
       var stepTitles = [
-        'Step 1 of 5 — Country',
-        'Step 2 of 5 — State',
-        'Step 3 of 5 — City',
-        'Step 4 of 5 — Society',
-        'Step 5 of 5 — Your details & flat'
+        'Step 1 of 7 — Email or phone',
+        'Step 2 of 7 — OTP',
+        'Step 3 of 7 — Country',
+        'Step 4 of 7 — State',
+        'Step 5 of 7 — City',
+        'Step 6 of 7 — Society',
+        'Step 7 of 7 — Your details & flat'
       ];
+
+      var signupSessionToken = null;
+      var verifiedContactType = null;
+      var verifiedContact = null;
+
+      /** Numeric society id for API calls (avoids /societies/NaN/... when the select value is empty or invalid). */
+      var selectedSocietyId = null;
+
+      function getSelectedSocietyId() {
+        var raw = societySelect.value;
+        if (raw === '' || raw == null) return null;
+        var n = parseInt(String(raw).trim(), 10);
+        return Number.isFinite(n) && n > 0 ? n : null;
+      }
 
       var currentStep = 0;
       var track = document.getElementById('wizardTrack');
@@ -181,12 +206,17 @@
       var stepLabel = document.getElementById('stepLabel');
       var slides = track.querySelectorAll('.wizard-slide');
 
+      var contactInput = document.getElementById('contact');
+      var otpInput = document.getElementById('otp');
+      var otpMasked = document.getElementById('otpMasked');
       var countrySelect = document.getElementById('countryId');
       var stateSelect = document.getElementById('stateId');
       var citySelect = document.getElementById('cityId');
       var societySelect = document.getElementById('societyId');
       var towerSelect = document.getElementById('tower');
       var flatSelect = document.getElementById('flatId');
+      var emailInput = document.getElementById('email');
+      var phoneInput = document.getElementById('phone');
       var locationSummary = document.getElementById('locationSummary');
 
       var dotsWrap = document.getElementById('stepDots');
@@ -197,6 +227,14 @@
         dotsWrap.appendChild(dot);
       }
       var dots = dotsWrap.querySelectorAll('.step-dot');
+
+      function layoutSlides() {
+        track.style.width = (TOTAL_STEPS * 100) + '%';
+        var pct = 100 / TOTAL_STEPS;
+        for (var i = 0; i < slides.length; i++) {
+          slides[i].style.flex = '0 0 ' + pct + '%';
+        }
+      }
 
       function updateDots() {
         for (var i = 0; i < dots.length; i++) {
@@ -214,7 +252,8 @@
 
       function goToStep(i) {
         currentStep = Math.max(0, Math.min(TOTAL_STEPS - 1, i));
-        track.style.transform = 'translateX(-' + (currentStep * 20) + '%)';
+        var stepPct = 100 / TOTAL_STEPS;
+        track.style.transform = 'translateX(-' + (currentStep * stepPct) + '%)';
         updateDots();
         updateSlideOpacity();
         var raw = stepTitles[currentStep];
@@ -246,6 +285,20 @@
         var d = document.createElement('div');
         d.textContent = str;
         return d.innerHTML;
+      }
+
+      function applyVerifiedContactToDetails() {
+        emailInput.removeAttribute('readonly');
+        phoneInput.removeAttribute('readonly');
+        emailInput.classList.remove('bg-light');
+        phoneInput.classList.remove('bg-light');
+        if (verifiedContactType === 'email') {
+          emailInput.value = verifiedContact;
+          emailInput.setAttribute('readonly', 'readonly');
+        } else if (verifiedContactType === 'phone') {
+          phoneInput.value = verifiedContact;
+          phoneInput.setAttribute('readonly', 'readonly');
+        }
       }
 
       function loadCountries() {
@@ -316,8 +369,9 @@
           var list = listFromResponse(data);
           societySelect.innerHTML = '<option value="">Select your society</option>';
           list.forEach(function (s) {
+            if (s == null || s.id == null || s.id === '') return;
             var o = document.createElement('option');
-            o.value = s.id;
+            o.value = String(s.id);
             o.textContent = s.name + (s.alias ? ' (' + s.alias + ')' : '');
             societySelect.appendChild(o);
           });
@@ -334,12 +388,13 @@
         towerSelect.innerHTML = '<option value="">Select tower / block</option>';
         flatSelect.innerHTML = '<option value="">Select tower first</option>';
         flatSelect.disabled = true;
-        if (!societyId) {
+        var sid = societyId != null && Number.isFinite(societyId) ? societyId : null;
+        if (!sid || sid <= 0) {
           towerSelect.disabled = true;
           return;
         }
         towerSelect.disabled = false;
-        fetch(url('/societies/' + societyId + '/towers')).then(function (r) { return r.json(); }).then(function (data) {
+        fetch(url('/societies/' + sid + '/towers')).then(function (r) { return r.json(); }).then(function (data) {
           var arr = listFromResponse(data);
           towerSelect.innerHTML = '<option value="">Select tower / block</option>';
           arr.forEach(function (t) {
@@ -356,8 +411,13 @@
       function loadFlats(societyId, tower) {
         flatSelect.innerHTML = '<option value="">Loading…</option>';
         flatSelect.disabled = true;
+        var sid = societyId != null && Number.isFinite(societyId) && societyId > 0 ? societyId : null;
+        if (!sid) {
+          flatSelect.innerHTML = '<option value="">Select society first</option>';
+          return;
+        }
         var q = tower ? '?tower=' + encodeURIComponent(tower) : '';
-        fetch(url('/societies/' + societyId + '/flats' + q)).then(function (r) { return r.json(); }).then(function (data) {
+        fetch(url('/societies/' + sid + '/flats' + q)).then(function (r) { return r.json(); }).then(function (data) {
           var signupFlats = listFromResponse(data);
           flatSelect.innerHTML = '<option value="">Select flat</option>';
           signupFlats.forEach(function (f) {
@@ -395,81 +455,162 @@
       });
 
       societySelect.addEventListener('change', function () {
-        var sid = societySelect.value ? parseInt(societySelect.value, 10) : null;
-        loadTowers(sid);
+        selectedSocietyId = getSelectedSocietyId();
+        loadTowers(selectedSocietyId);
       });
 
       towerSelect.addEventListener('change', function () {
-        var sid = societySelect.value ? parseInt(societySelect.value, 10) : null;
+        var sid = selectedSocietyId != null ? selectedSocietyId : getSelectedSocietyId();
+        if (sid == null) {
+          showErr('Select a society on the previous step first.');
+          return;
+        }
         loadFlats(sid, towerSelect.value || '');
       });
 
-      function validateStep() {
+      function showErr(msg) {
         var err = document.getElementById('formError');
-        err.classList.remove('show');
-        err.textContent = '';
-        if (currentStep === 0 && !countrySelect.value) {
-          err.textContent = 'Please select a country.';
-          err.classList.add('show');
+        err.textContent = msg || '';
+        err.classList.toggle('show', !!msg);
+      }
+
+      function validateStep() {
+        showErr('');
+        if (currentStep === 0) {
+          var c = contactInput.value.trim();
+          if (c.length < 3) {
+            showErr('Enter your email or mobile number.');
+            return false;
+          }
+          return true;
+        }
+        if (currentStep === 1) {
+          var o = otpInput.value.trim();
+          if (!/^\d{6}$/.test(o)) {
+            showErr('Enter the 6-digit OTP.');
+            return false;
+          }
+          return true;
+        }
+        if (currentStep === 2 && !countrySelect.value) {
+          showErr('Please select a country.');
           return false;
         }
-        if (currentStep === 1 && !stateSelect.value) {
-          err.textContent = 'Please select a state.';
-          err.classList.add('show');
+        if (currentStep === 3 && !stateSelect.value) {
+          showErr('Please select a state.');
           return false;
         }
-        if (currentStep === 2 && !citySelect.value) {
-          err.textContent = 'Please select a city.';
-          err.classList.add('show');
+        if (currentStep === 4 && !citySelect.value) {
+          showErr('Please select a city.');
           return false;
         }
-        if (currentStep === 3 && !societySelect.value) {
-          err.textContent = 'Please select a society.';
-          err.classList.add('show');
+        if (currentStep === 5 && !societySelect.value) {
+          showErr('Please select a society.');
           return false;
         }
-        if (currentStep === 4) {
+        if (currentStep === 6) {
           var name = document.getElementById('name').value.trim();
-          var email = document.getElementById('email').value.trim();
+          var email = emailInput.value.trim();
+          var phone = phoneInput.value.trim();
           var flatOpt = flatSelect.options[flatSelect.selectedIndex];
           var tower = flatOpt && flatOpt.dataset ? flatOpt.dataset.tower : '';
           var flatNumber = flatOpt && flatOpt.dataset ? flatOpt.dataset.flatNumber : '';
           var password = document.getElementById('password').value;
           if (!name || !email || !tower || !flatNumber || !password || password.length < 6) {
-            err.textContent = 'Please fill all required fields. Password min 6 characters.';
-            err.classList.add('show');
+            showErr('Please fill all required fields. Password min 6 characters.');
             return false;
           }
         }
         return true;
       }
 
+      function requestSignupOtp() {
+        return fetch(url('/auth/signup-otp/request'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contact: contactInput.value.trim() }),
+        }).then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); });
+      }
+
+      function verifySignupOtp() {
+        return fetch(url('/auth/signup-otp/verify'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contact: contactInput.value.trim(), otp: otpInput.value.trim() }),
+        }).then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); });
+      }
+
       btnNext.addEventListener('click', function () {
         if (!validateStep()) return;
+
+        if (currentStep === 0) {
+          btnNext.disabled = true;
+          requestSignupOtp().then(function (result) {
+            if (result.ok && result.data.success) {
+              var m = (result.data.data && result.data.data.maskedContact) ? result.data.data.maskedContact : '';
+              otpMasked.textContent = m ? ('Code sent to ' + m) : '';
+              goToStep(1);
+            } else {
+              showErr((result.data && result.data.message) || 'Could not send OTP.');
+            }
+            btnNext.disabled = false;
+          }).catch(function () {
+            showErr('Network error.');
+            btnNext.disabled = false;
+          });
+          return;
+        }
+
+        if (currentStep === 1) {
+          btnNext.disabled = true;
+          verifySignupOtp().then(function (result) {
+            if (result.ok && result.data.success && result.data.data && result.data.data.signupSessionToken) {
+              signupSessionToken = result.data.data.signupSessionToken;
+              verifiedContactType = result.data.data.contactType;
+              verifiedContact = result.data.data.contact;
+              applyVerifiedContactToDetails();
+              goToStep(2);
+            } else {
+              showErr((result.data && result.data.message) || 'Invalid OTP. Use 000000 for demo.');
+            }
+            btnNext.disabled = false;
+          }).catch(function () {
+            showErr('Network error.');
+            btnNext.disabled = false;
+          });
+          return;
+        }
+
         if (currentStep < TOTAL_STEPS - 1) {
           var next = currentStep + 1;
-          if (currentStep === 2) {
+          if (currentStep === 4) {
             refreshLocationSummary();
             loadSocieties().then(function () { goToStep(next); });
             return;
           }
           goToStep(next);
-          if (currentStep === 4 && societySelect.value) {
-            loadTowers(parseInt(societySelect.value, 10));
-            var t = towerSelect.value;
-            if (t) loadFlats(parseInt(societySelect.value, 10), t);
+          if (currentStep === 6) {
+            selectedSocietyId = getSelectedSocietyId();
+            if (selectedSocietyId != null) {
+              loadTowers(selectedSocietyId);
+              var t = towerSelect.value;
+              if (t) loadFlats(selectedSocietyId, t);
+            }
           }
           return;
         }
 
-        var err = document.getElementById('formError');
-        var societyId = parseInt(societySelect.value, 10);
+        var societyId = getSelectedSocietyId();
+        if (societyId == null) {
+          showErr('Invalid society. Go back and select your society again.');
+          return;
+        }
         var countryId = parseInt(countrySelect.value, 10);
         var stateId = parseInt(stateSelect.value, 10);
         var cityId = parseInt(citySelect.value, 10);
         var name = document.getElementById('name').value.trim();
-        var email = document.getElementById('email').value.trim();
-        var phone = document.getElementById('phone').value.trim();
+        var email = emailInput.value.trim();
+        var phone = phoneInput.value.trim();
         var flatOpt = flatSelect.options[flatSelect.selectedIndex];
         var tower = flatOpt && flatOpt.dataset ? flatOpt.dataset.tower : '';
         var flatNumber = flatOpt && flatOpt.dataset ? flatOpt.dataset.flatNumber : '';
@@ -481,6 +622,7 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            signupSessionToken: signupSessionToken,
             societyId: societyId,
             countryId: countryId,
             stateId: stateId,
@@ -502,25 +644,24 @@
                 document.getElementById('successMsg').textContent = result.data.data.message;
               }
             } else {
-              err.textContent = (result.data && result.data.message) || 'Request failed. Try again.';
-              err.classList.add('show');
+              showErr((result.data && result.data.message) || 'Request failed. Try again.');
               btnNext.disabled = false;
               btnNext.textContent = 'Submit request';
             }
           })
           .catch(function () {
-            err.textContent = 'Network error. Please try again.';
-            err.classList.add('show');
+            showErr('Network error. Please try again.');
             btnNext.disabled = false;
             btnNext.textContent = 'Submit request';
           });
       });
 
       btnBack.addEventListener('click', function () {
-        document.getElementById('formError').classList.remove('show');
+        showErr('');
         if (currentStep > 0) goToStep(currentStep - 1);
       });
 
+      layoutSlides();
       goToStep(0);
       loadCountries();
     })();
